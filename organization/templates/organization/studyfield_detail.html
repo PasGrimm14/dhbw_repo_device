@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ field.studyfield }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>🎯 {{ field.studyfield }}</h2>
+
+<div class="card">
+    <h3>Informationen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Studienrichtung</label>
+            <div>{{ field.studyfield }}</div>
+        </div>
+        <div class="info-item">
+            <label>Studiengang</label>
+            <div>
+                <a href="{% url 'organization:program_detail' field.study.id %}">
+                    {{ field.study.study_progr }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Kurse in dieser Studienrichtung ({{ courses.count }})</h3>
+    
+    {% if courses %}
+    <table>
+        <thead>
+            <tr>
+                <th>Kurs-Nr.</th>
+                <th>Akademie</th>
+                <th>Jahrgang</th>
+                <th>Studenten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td><strong>{{ course.course_nr }}</strong></td>
+                <td>{{ course.academy.academy_name }}</td>
+                <td>{{ course.academic_year.year_name }}</td>
+                <td><span class="badge">{{ course.students.count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:course_detail' course.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Kurse für diese Studienrichtung.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:field_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

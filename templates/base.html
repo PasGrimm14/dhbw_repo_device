@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} | DHBW SYNC</title>
+    <link rel="stylesheet" href="{% static 'stylesheet-main.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}" >
+    <style>
+
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>N'SYNC</h1>
+            <button class="nav-toggle" aria-label="Menü öffnen" aria-expanded="false">&#9776;</button>
+            <div class="header-right">
+                {% if user.is_authenticated %}
+                <nav>
+                    <ul>
+                        <li><a href="{% url 'researches:dashboard' %}">Wiss. Arbeiten</a></li>
+                        {% if user_roles.employee %}
+                        <li><a href="{% url 'persons:dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'lectures:dashboard' %}">Module</a></li>
+                        <li><a href="{% url 'persons:person_list' %}">Personen</a></li>
+                        <li><a href="{% url 'persons:student_list' %}">Studenten</a></li>
+                        <li><a href="{% url 'persons:personnel_list' %}">Personal</a></li>
+                        <li><a href="{% url 'persons:company_list' %}">Unternehmen</a></li>
+                        <li><a href="{% url 'imports:dashboard' %}">Import</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <div class="user-menu">
+                    <button class="user-menu-btn">{{ user.get_full_name|default:user.username }}</button>
+                    <div class="user-dropdown">
+                        <div class="dropdown-header">Angemeldet als</div>
+                        <div style="padding: 0.1rem 1rem 0.5rem; font-size:0.85rem; color:#555;">{{ user.username }}</div>
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'accounts:user_detail' request.user.id %}">Mein Profil</a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'accounts:user_list' %}">Benutzerverwaltung</a>
+                        <a href="{% url 'accounts:group_list' %}">Rechteverwaltung</a>
+                        <a href="{% url 'organization:dashboard' %}">Organisation</a>
+                        <a href="/admin/">Django Admin</a>
+                        <div class="dropdown-divider"></div>
+                        {% endif %}
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit">Abmelden</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" style="color:white; text-decoration:none; opacity:0.9;">Anmelden</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>SYNC - Ein Projekt des Studiengangs Wirtschaftsinformatik und des Kurses WI24A3</p>
+            <p><a href="{% url 'impressum' %}">Impressum</a></p>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var btn = document.querySelector('.nav-toggle');
+            var nav = document.querySelector('.header-right');
+            if (!btn || !nav) return;
+            btn.addEventListener('click', function () {
+                if (nav.style.display === 'flex') {
+                    nav.style.display = 'none';
+                    btn.innerHTML = '&#9776;';
+                } else {
+                    nav.style.display = 'flex';
+                    btn.innerHTML = '&#10005;';
+                }
+            });
+        })();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,190 @@
+{% extends 'researches/dashboard.html' %}
+
+{% block group_dashboard %}
+
+<h3>Meine Betreuungen</h3>
+<div class="info-grid">
+    <div class="card">
+        <h3>Gesamt Betreut PA1</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_researches_pa1 }}</p>        
+    </div>
+    
+    <div class="card">
+        <h3>Gesamt Betreut PA2</h3>
+        <p style="font-size: 2rem; margin: 1rem 0; color: #27ae60;">{{ total_researches_pa2 }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>Gesamt Betreut BA</h3>
+        <p style="font-size: 2rem; margin: 1rem 0; color: #f39c12;">{{ total_researches_ba }}</p>
+    </div>
+</div>
+
+<h3>Von mir und meinen Kursen</h3>
+<div class="info-grid" style="margin-top: 1.5rem;">
+    <div class="card">
+        <h3>Gesamt Abgeschlossen</h3>
+        <p style="font-size: 2rem; margin: 1rem 0; color: #27ae60;">{{ total_researches_finished }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>Gerade Laufend</h3>
+        <p style="font-size: 2rem; margin: 1rem 0; color: #3498db;">{{ total_researches_running }}</p>
+    </div>
+    
+    <div class="card">
+        <h3>Anstehend</h3>
+        <p style="font-size: 2rem; margin: 1rem 0; color: #e74c3c;">{{ total_researches_waiting }}</p>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 1.5rem;">
+    <h3>
+        Phasen von wissenschaftlichen Arbeiten 
+        <a href="{% url 'researches:researchphase_list' %}" class="btn">Alle Phasen</a>
+        <a href="{% url 'researches:researchphase_create' %}" class="btn">+ Neu Phase</a>
+    </h3>
+    <table>
+        <tr>
+            <th>Kurs</th>
+            <th>PA1</th>
+            <th>PA2</th>
+            <th>BA</th>
+        </tr>
+        {% for course in sgl_courses %}
+        <tr>
+            <td>{{course}}</td>
+            <td>
+                {%if course.pa1_phase %}
+                    <a href ="{% url 'researches:researchphase_detail' course.pa1_phase.id %}">
+                        {{course.pa1_phase}}
+                        <span class="badge" style="margin-left:1em">{{ course.pa1_phase.status_display }}</span>
+                    </a>
+                {% else %}
+                    -               
+                {% endif %}
+            </td>
+            <td>
+                {%if course.pa2_phase %}
+                    <a href ="{% url 'researches:researchphase_detail' course.pa2_phase.id %}">
+                        {{course.pa2_phase}}
+                        <span class="badge" style="margin-left:1em">{{ course.pa2_phase.status_display }}</span>
+                    </a>
+                {% else %}
+                    -               
+                {% endif %}
+            </td>
+            <td>
+                {%if course.ba_phase %}
+                    <a href ="{% url 'researches:researchphase_detail' course.ba_phase.id %}">
+                        {{course.ba_phase}}
+                        <span class="badge" style="margin-left:1em">{{ course.ba_phase.status_display }}</span>
+                    </a>
+                {% else %}
+                    -                
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+            <td>Keine Kurse gefunden.</td>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card">
+    <h3>
+        Meine wissenschaftlichen Arbeiten
+        {% if user_roles.employee %}
+            <a href="{% url 'researches:research_list' %}" class="btn">Alle anzeigen</a>
+        {% endif %}
+    </h3>
+    {% if my_researches %}
+    <div style="margin-bottom:0.75rem;">
+        <label for="filter-veranstaltung" style="font-weight:600; margin-right:0.5rem;">Veranstaltung:</label>
+        <select id="filter-veranstaltung">
+            <option value="">Alle</option>
+        </select>
+    </div>
+    <table id="researches-table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Titel</th>
+                <th>Veranstaltung</th>
+                <th>Betreuer</th>
+                <th>Start</th>
+                <th>Status</th>
+                {% if user_roles.student %} <th>Einreichung</th> {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for research in my_researches %}
+            <tr>
+                <td>{{ research.student.person.get_full_name }}</td>
+                <td>
+                    {{ research.title|default:"(Kein Titel)" }}
+                </td>
+                <td>{{ research.unit.unit_name_short|default:research.unit.unit_name }}</td>
+                <td>{{ research.assessor_scien.person.get_short_name|default:"-" }}</td>
+                <td>{{ research.start_date|date:"d.m.Y" }}</td>
+                <td><span class="badge">{{ research.status_display }}</span></td>
+                {% if user_roles.student %}
+                <td>
+                    {% if research.topic_submitted_date %}
+                    <a href="{% url 'researches:research_form_preview' research.id %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Eingereicht ✅</a>
+                    {% else %}
+                    <a href="{% url 'researches:research_form' research.id %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Thema einreichen</a>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Noch keine Forschungsarbeiten.</p>
+    {% endif %}
+</div>
+
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tableEl = document.getElementById('researches-table');
+    if (tableEl) {
+        const dt = new DataTable(tableEl, {
+            pageLength: 10,
+            language: {
+                lengthMenu: '_MENU_ Einträge anzeigen',
+                zeroRecords: 'Keine Einträge gefunden',
+                info: '_START_ bis _END_ von _TOTAL_ Einträgen',
+                infoEmpty: 'Keine Einträge vorhanden',
+                infoFiltered: '(gefiltert aus _MAX_ Einträgen)',
+                search: 'Suchen:',
+                paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+            },
+        });
+
+        // Dropdown mit eindeutigen Veranstaltungs-Werten befüllen (Spalte 2)
+        const select = document.getElementById('filter-veranstaltung');
+        dt.column(2).data().unique().sort().each(function (val) {
+            if (val) {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = val;
+                select.appendChild(opt);
+            }
+        });
+
+        select.addEventListener('change', function () {
+            dt.column(2).search(this.value, false, false).draw();
+        });
+    }
+});
+</script>
+{% endblock %}

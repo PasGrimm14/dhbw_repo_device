@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ unit.unit_name }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>📝 {{ unit.unit_name }}</h2>
+
+<div class="card">
+    <h3>Veranstaltungsinformationen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Veranstaltungsnummer</label>
+            <div><strong>{{ unit.unit_nr }}</strong></div>
+        </div>
+        <div class="info-item">
+            <label>Name</label>
+            <div>{{ unit.unit_name }}</div>
+        </div>
+        <div class="info-item">
+            <label>Kurzname</label>
+            <div>{{ unit.unit_name_short|default:"-" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Modul</label>
+            <div>
+                <a href="{% url 'lectures:module_detail' unit.module.id %}">
+                    {{ unit.module.module_nr }} - {{ unit.module.name }}
+                </a>
+            </div>
+        </div>
+        <div class="info-item">
+            <label>Lehreinheiten</label>
+            <div>{{ unit.units }}</div>
+        </div>
+        <div class="info-item">
+            <label>Semester</label>
+            <div>{{ unit.semester_nr }}. Semester</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Noten-Statistik</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Anzahl Noten</label>
+            <div><span class="badge">{{ grade_stats.count }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>Durchschnittsnote</label>
+            <div>
+                {% if grade_stats.avg %}
+                <strong>{{ grade_stats.avg|floatformat:2 }}</strong>
+                {% else %}
+                -
+                {% endif %}
+            </div>
+        </div>
+        <div class="info-item">
+            <label>Bestanden</label>
+            <div><span class="badge" style="background: #27ae60;">{{ grade_stats.num_passed }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>Nicht bestanden</label>
+            <div><span class="badge" style="background: #e74c3c;">{{ grade_stats.num_failed }}</span></div>
+        </div>
+    </div>
+</div>
+
+{% if grades %}
+<div class="card">
+    <h3>Alle Noten ({{ grades.count }})</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Matrikel-Nr.</th>
+                <th>Note</th>
+                <th>Status</th>
+                <th>Versuch</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>
+                    <a href="{% url 'lectures:student_grades' grade.student.id %}">
+                        {{ grade.student.person.get_full_name }}
+                    </a>
+                </td>
+                <td>{{ grade.student.matri_nr }}</td>
+                <td><strong>{{ grade.grade }}</strong></td>
+                <td>
+                    {% if grade.passed %}
+                    <span class="badge" style="background: #27ae60;">✓ Bestanden</span>
+                    {% else %}
+                    <span class="badge" style="background: #e74c3c;">✗ Nicht bestanden</span>
+                    {% endif %}
+                </td>
+                <td>{{ grade.attempt }}. Versuch</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'lectures:unit_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+    <a href="{% url 'lectures:module_detail' unit.module.id %}" class="btn btn-secondary">Zum Modul</a>
+</div>
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ research }} – Bearbeiten{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <a href="{% url 'researches:research_detail' research.pk %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">← Zurück</a>
+    <h2 style="margin:0;">{{ research.title|default:"(Kein Titel)" }}</h2>
+    <span class="badge">{{ research.status_display }}</span>
+</div>
+
+<form method="post">
+{% csrf_token %}
+
+{# ---- Stammdaten (read-only) ---- #}
+<div class="info-grid">
+    <div class="card">
+        <h3>Student</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <td>{{ research.student.person.get_full_name }}</td>
+            </tr>
+            <tr>
+                <th>Matrikelnummer</th>
+                <td>{{ research.student.matri_nr }}</td>
+            </tr>
+            <tr>
+                <th>Kurs</th>
+                <td>{{ research.student.course }}</td>
+            </tr>
+            {% if research.student.company %}
+            <tr>
+                <th>Dualer Partner</th>
+                <td>{{ research.student.company.name }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Termine</h3>
+        <table>
+            <tr>
+                <th>Einreichungsfrist Thema</th>
+                <td>
+                    <input type="date" name="topic_submit_deadline"
+                        value="{{ research.topic_submit_deadline|date:'Y-m-d' }}">
+                </td>
+            </tr>
+            <tr>
+                <th>Startdatum</th>
+                <td>
+                    <input type="date" name="start_date"
+                        value="{{ research.start_date|date:'Y-m-d' }}">
+                </td>
+            </tr>
+            <tr>
+                <th>Abgabefrist</th>
+                <td>
+                    <input type="date" name="end_date"
+                        value="{{ research.end_date|date:'Y-m-d' }}">
+                </td>
+            </tr>
+            <tr>
+                <th>Thema eingereicht am</th>
+                <td>
+                    <input type="date" name="topic_submitted_date"
+                        value="{{ research.topic_submitted_date|date:'Y-m-d' }}">
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+{# ---- Genehmigungen ---- #}
+<div class="card">
+    <h3>Genehmigungen</h3>
+    <table>
+        <tr>
+            <th>Betrieblich</th>
+            <td>
+                <label class="toggle">
+                    <input type="checkbox" name="approved_oper"
+                        {% if research.approved_oper %}checked{% endif %}>
+                    Vom Betrieb genehmigt
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th>Wissenschaftlich</th>
+            <td>
+                <label class="toggle">
+                    <input type="checkbox" name="approved_scien"
+                        {% if research.approved_scien %}checked{% endif %}>
+                    Von wiss. Betreuung genehmigt
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th>Studiengangsleitung</th>
+            <td>
+                <label class="toggle">
+                    <input type="checkbox" name="approved_orga"
+                        {% if research.approved_orga %}checked{% endif %}>
+                    Von Studiengangsleitung genehmigt
+                </label>
+            </td>
+        </tr>
+    </table>
+</div>
+
+{# ---- Betriebliche Betreuung ---- #}
+<div class="card">
+    <h3>Betriebliche Betreuung</h3>
+    <table>
+        <tr>
+            <th>Unternehmen der Betreuung</th>
+            <td>
+                <input type="text" name="company_context" maxlength="200"
+                    value="{{ research.company_context|default:'' }}">
+            </td>
+        </tr>
+        <tr>
+            <th>Betrieblicher Betreuer</th>
+            <td>
+                <select name="assessor_oper">
+                    <option value="">– kein –</option>
+                    {% for person in coas_persons %}
+                    <option value="{{ person.pk }}"
+                        {% if research.assessor_oper_id == person.pk %}selected{% endif %}>
+                        {{ person.lastname }} {{ person.firstname }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        {% if research.assessor_oper %}
+        <tr>
+            <th>Aktuell eingetragen</th>
+            <td class="hint">
+                {{ research.assessor_oper.get_full_name }}
+                {% if research.assessor_oper.mail_main %}({{ research.assessor_oper.mail_main }}){% endif %}
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+</div>
+
+{# ---- Wissenschaftliche Betreuung ---- #}
+<div class="card">
+    <h3>Wissenschaftliche Betreuung</h3>
+    <table>
+        <tr>
+            <th>Wiss. Betreuer</th>
+            <td>
+                <select name="assessor_scien">
+                    <option value="">– kein –</option>
+                    {% for personnel in course_personnel %}
+                    <option value="{{ personnel.pk }}"
+                        {% if research.assessor_scien_id == personnel.pk %}selected{% endif %}>
+                        {{ personnel.person.lastname }} {{ personnel.person.firstname }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </td>
+        </tr>
+        {% if research.comment %}
+        <tr>
+            <th>Wunschbetreuung (Student)</th>
+            <td>{{ research.comment }}</td>
+        </tr>
+        {% endif %}
+    </table>
+</div>
+
+{# ---- Inhalt der Arbeit ---- #}
+<div class="card">
+    <h3>Inhalt der Arbeit</h3>
+    <div class="row">
+        <label>Titel der Arbeit
+            <input type="text" name="title" maxlength="500"
+                value="{{ research.title|default:'' }}">
+        </label>
+    </div>
+    <div class="row">
+        <label>Problemstellung
+            <textarea name="problem" rows="8">{{ research.problem|default:'' }}</textarea>
+        </label>
+    </div>
+    <div class="row">
+        <label>Zielsetzung
+            <textarea name="goal" rows="8">{{ research.goal|default:'' }}</textarea>
+        </label>
+    </div>
+    <div class="row">
+        <label>Methodik und Vorgehensweise
+            <textarea name="methodology" rows="8">{{ research.methodology|default:'' }}</textarea>
+        </label>
+    </div>
+</div>
+
+{# ---- Aktionen ---- #}
+<div class="card actions">
+    <div class="actions-row">
+        <button type="submit" class="btn">Speichern</button>
+        <a href="{% url 'researches:research_detail' research.pk %}" class="btn btn-secondary">Abbrechen</a>
+    </div>
+</div>
+
+</form>
+{% endblock %}

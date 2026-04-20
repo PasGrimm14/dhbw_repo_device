@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ person.get_full_name }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>{{ person.get_full_name }}</h2>
+
+<div class="card">
+    <h3>Persönliche Daten</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Vorname</label>
+            <div>{{ person.firstname }}</div>
+        </div>
+        <div class="info-item">
+            <label>Nachname</label>
+            <div>{{ person.lastname }}</div>
+        </div>
+        {% if person.title %}
+        <div class="info-item">
+            <label>Titel</label>
+            <div>{{ person.title }}</div>
+        </div>
+        {% endif %}
+        {% if person.birthday %}
+        <div class="info-item">
+            <label>Geburtstag</label>
+            <div>{{ person.birthday|date:"d.m.Y" }}</div>
+        </div>
+        {% endif %}
+        {% if person.gender %}
+        <div class="info-item">
+            <label>Geschlecht</label>
+            <div>{{ person.get_gender_display }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3>Kontaktdaten</h3>
+    <div class="info-grid">
+        {% if person.mail_main %}
+        <div class="info-item">
+            <label>E-Mail</label>
+            <div><a href="mailto:{{ person.mail_main }}">{{ person.mail_main }}</a></div>
+        </div>
+        {% endif %}
+        {% if person.tel_main %}
+        <div class="info-item">
+            <label>Telefon</label>
+            <div><a href="tel:{{ person.tel_main }}">{{ person.tel_main }}</a></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3>Rolle</h3>
+    <div class="info-item">
+        <label>Aktuelle Rolle</label>
+        <div><span class="badge">{{ person.get_role_now_display }}</span></div>
+    </div>
+</div>
+
+{% if student %}
+<div class="card">
+    <h3>📚 Studierenden-Informationen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Matrikelnummer</label>
+            <div>{{ student.matri_nr }}</div>
+        </div>
+        <div class="info-item">
+            <label>Kurs</label>
+            <div>{{ student.course }}</div>
+        </div>
+        <div class="info-item">
+            <label>Studienrichtung</label>
+            <div>{{ student.field }}</div>
+        </div>
+        <div class="info-item">
+            <label>Unternehmen</label>
+            <div>{{ student.company }}</div>
+        </div>
+    </div>
+    <a href="{% url 'persons:student_detail' student.id %}" class="btn">Studierenden-Details</a>
+</div>
+{% endif %}
+
+{% if personnel %}
+<div class="card">
+    <h3>👨‍🏫 Personal-Informationen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Personalnummer</label>
+            <div>{{ personnel.personnel_nr|default:"-" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Aktantentyp</label>
+            <div>{{ personnel.actant_type }}</div>
+        </div>
+    </div>
+    <a href="{% url 'persons:personnel_detail' personnel.id %}" class="btn">Personal-Details</a>
+</div>
+{% endif %}
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'persons:person_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

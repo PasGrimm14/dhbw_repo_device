@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Jahrgang {{ year.year_name }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>📆 Jahrgang {{ year.year_name }}</h2>
+
+<div class="card">
+    <h3>Aktuelles Semester</h3>
+    {% if current_semester %}
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Semester</label>
+            <div><strong>{{ current_semester.name_short }}</strong></div>
+        </div>
+        <div class="info-item">
+            <label>Typ</label>
+            <div><span class="badge">{{ current_semester.get_type_display }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>Zeitraum</label>
+            <div>{{ current_semester.start_date|date:"d.m.Y" }} - {{ current_semester.end_date|date:"d.m.Y" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Status</label>
+            <div><span class="badge" style="background: #27ae60;">✓ Läuft</span></div>
+        </div>
+    </div>
+    {% else %}
+    <p style="color: #95a5a6; font-style: italic;">Aktuell läuft kein Semester für diesen Jahrgang.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Alle Semester des Jahrgangs</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Jahr</th>
+                <th>Semester</th>
+                <th>Name</th>
+                <th>Typ</th>
+                <th>Start</th>
+                <th>Ende</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="2"><strong>1. Jahr</strong></td>
+                <td>1T</td>
+                <td>{{ year.semester_id1t.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id1t.get_type_display }}</span></td>
+                <td>{{ year.semester_id1t.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id1t.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id1t.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <td>1P</td>
+                <td>{{ year.semester_id1p.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id1p.get_type_display }}</span></td>
+                <td>{{ year.semester_id1p.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id1p.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id1p.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            
+            <tr>
+                <td rowspan="2"><strong>2. Jahr</strong></td>
+                <td>2T</td>
+                <td>{{ year.semester_id2t.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id2t.get_type_display }}</span></td>
+                <td>{{ year.semester_id2t.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id2t.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id2t.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <td>2P</td>
+                <td>{{ year.semester_id2p.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id2p.get_type_display }}</span></td>
+                <td>{{ year.semester_id2p.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id2p.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id2p.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            
+            <tr>
+                <td rowspan="2"><strong>3. Jahr</strong></td>
+                <td>3T</td>
+                <td>{{ year.semester_id3t.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id3t.get_type_display }}</span></td>
+                <td>{{ year.semester_id3t.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id3t.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id3t.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <td>3P</td>
+                <td>{{ year.semester_id3p.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id3p.get_type_display }}</span></td>
+                <td>{{ year.semester_id3p.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id3p.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id3p.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            
+            <tr>
+                <td rowspan="2"><strong>4. Jahr</strong></td>
+                <td>4T</td>
+                <td>{{ year.semester_id4t.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id4t.get_type_display }}</span></td>
+                <td>{{ year.semester_id4t.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id4t.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id4t.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <td>4P</td>
+                <td>{{ year.semester_id4p.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id4p.get_type_display }}</span></td>
+                <td>{{ year.semester_id4p.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id4p.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id4p.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            
+            <tr>
+                <td rowspan="2"><strong>5. Jahr</strong></td>
+                <td>5T</td>
+                <td>{{ year.semester_id5t.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id5t.get_type_display }}</span></td>
+                <td>{{ year.semester_id5t.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id5t.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id5t.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <td>5P</td>
+                <td>{{ year.semester_id5p.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id5p.get_type_display }}</span></td>
+                <td>{{ year.semester_id5p.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id5p.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id5p.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            
+            <tr>
+                <td rowspan="2"><strong>6. Jahr</strong></td>
+                <td>6T</td>
+                <td>{{ year.semester_id6t.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id6t.get_type_display }}</span></td>
+                <td>{{ year.semester_id6t.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id6t.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id6t.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <td>6P</td>
+                <td>{{ year.semester_id6p.name_short }}</td>
+                <td><span class="badge">{{ year.semester_id6p.get_type_display }}</span></td>
+                <td>{{ year.semester_id6p.start_date|date:"d.m.Y" }}</td>
+                <td>{{ year.semester_id6p.end_date|date:"d.m.Y" }}</td>
+                <td>{% if year.semester_id6p.is_active %}<span style="color: #27ae60;">✓</span>{% else %}-{% endif %}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h3>Kurse in diesem Jahrgang ({{ courses.count }})</h3>
+    
+    {% if courses %}
+    <table>
+        <thead>
+            <tr>
+                <th>Kurs-Nr.</th>
+                <th>Akademie</th>
+                <th>Studienrichtung</th>
+                <th>Studenten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td><strong>{{ course.course_nr }}</strong></td>
+                <td>{{ course.academy.academy_name }}</td>
+                <td>{{ course.field|default:"-" }}</td>
+                <td><span class="badge">{{ course.students.count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:course_detail' course.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Kurse für diesen Jahrgang.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:year_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

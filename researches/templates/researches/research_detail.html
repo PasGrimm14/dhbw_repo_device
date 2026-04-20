@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ research }}{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+    <a href="{% url 'researches:research_list' %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">← Alle Arbeiten</a>
+    <h2 style="margin:0;">{{ research.title|default:"(Kein Titel)" }}</h2>
+    <span class="badge">{{ research.status_display }}</span>
+    <br>
+    <a href="{% url 'researches:research_edit' research.id %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Bearbeiten</a>
+</div>
+
+<div class="info-grid">
+    <div class="card">
+        <h3>Stammdaten</h3>
+        <table>
+            <tr>
+                <th>Student</th>
+                <td>{{ research.student.person.get_full_name }}</td>
+            </tr>
+            <tr>
+                <th>Veranstaltung</th>
+                <td>{{ research.unit }}</td>
+            </tr>
+            <tr>
+                <th>Forschungsphase</th>
+                <td>
+                    {% if research.research_phase %}
+                    <a href="{% url 'researches:researchphase_detail' research.research_phase.pk %}">{{ research.research_phase }}</a>
+                    {% else %}–{% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Einreichungsfrist Thema</th>
+                <td>{{ research.topic_submit_deadline|date:"d.m.Y" }}</td>
+            </tr>
+            <tr>
+                <th>Startdatum</th>
+                <td>{{ research.start_date|date:"d.m.Y" }}</td>
+            </tr>
+            <tr>
+                <th>Abgabefrist</th>
+                <td>
+                    {{ research.end_date|date:"d.m.Y" }}
+                    {% if research.days_remaining is not None %}
+                    <span style="color:{% if research.days_remaining <= 7 %}#e74c3c{% elif research.days_remaining <= 30 %}#f39c12{% else %}#27ae60{% endif %}; font-size:0.85em; margin-left:0.5em;">
+                        ({{ research.days_remaining }} Tage verbleibend)
+                    </span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Dauer</th>
+                <td>{{ research.duration_days|default:"–" }} Tage</td>
+            </tr>
+            {% if research.topic_submitted_date %}
+            <tr>
+                <th>Thema eingereicht am</th>
+                <td>{{ research.topic_submitted_date|date:"d.m.Y" }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Genehmigungen</h3>
+        <table>
+            <tr>
+                <th>Betrieblich</th>
+                <td>
+                    {% if research.approved_oper %}
+                    <span class="badge" style="background:#198754;">Genehmigt</span>
+                    {% else %}
+                    <span class="badge" style="background:#6c757d;">Ausstehend</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Studiengangsleitung</th>
+                <td>
+                    {% if research.approved_orga %}
+                    <span class="badge" style="background:#198754;">Genehmigt</span>
+                    {% else %}
+                    <span class="badge" style="background:#6c757d;">Ausstehend</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <!--<tr>
+                <th>Wissenschaftlich</th>
+                <td>
+                    {% if research.approved_scien %}
+                    <span class="badge" style="background:#198754;">Genehmigt</span>
+                    {% else %}
+                    <span class="badge" style="background:#6c757d;">Ausstehend</span>
+                    {% endif %}
+                </td>
+            </tr>-->
+        </table>
+    </div>
+</div>
+
+<div class="info-grid" style="margin-top:1.5rem;">
+    <div class="card">
+        <h3>Betreuung</h3>
+        <table>
+            <tr>
+                <th>Wiss. Betreuung</th>
+                <td>{{ research.assessor_scien.person.get_full_name|default:"–" }}</td>
+            </tr>
+            <tr>
+                <th>Betriebl. Betreuung</th>
+                <td>
+                    {% if research.assessor_oper %}
+                    {{ research.assessor_oper.salutation_short|default:"" }} {{ research.assessor_oper.title|default:"" }} {{ research.assessor_oper.firstname }} {{ research.assessor_oper.lastname }}
+                    {% if research.assessor_oper.mail_main %}
+                    <br><a href="mailto:{{ research.assessor_oper.mail_main }}">{{ research.assessor_oper.mail_main }}</a>
+                    {% endif %}
+                    {% else %}–{% endif %}
+                </td>
+            </tr>
+            {% if research.company_context %}
+            <tr>
+                <th>Dualer Partner (Betreuung)</th>
+                <td>{{ research.company_context }}</td>
+            </tr>
+            {% endif %}
+            {% if research.comment %}
+            <tr>
+                <th>Betreuerwunsch</th>
+                <td>{{ research.comment }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>Student</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <td>{{ research.student.person.get_full_name }}</td>
+            </tr>
+            <tr>
+                <th>Matrikelnummer</th>
+                <td>{{ research.student.matri_nr }}</td>
+            </tr>
+            <tr>
+                <th>Kurs</th>
+                <td>{{ research.student.course }}</td>
+            </tr>
+            <tr>
+                <th>E-Mail</th>
+                <td>
+                    {% if research.student.person.mail_main %}
+                    <a href="mailto:{{ research.student.person.mail_main }}">{{ research.student.person.mail_main }}</a>
+                    {% else %}–{% endif %}
+                </td>
+            </tr>
+            {% if research.student.company %}
+            <tr>
+                <th>Dualer Partner</th>
+                <td>{{ research.student.company.name }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+{% if research.title or research.problem or research.goal or research.methodology %}
+<div class="card" style="margin-top:1.5rem;">
+    <h3>Inhalt der Arbeit</h3>
+    {% if research.title %}
+    <dl>
+        <dt style="font-weight:bold; color:#555; font-size:0.85em;">Titel</dt>
+        <dd style="margin:0.2em 0 1em 0;">{{ research.title }}</dd>
+    </dl>
+    {% endif %}
+    {% if research.problem %}
+    <dl>
+        <dt style="font-weight:bold; color:#555; font-size:0.85em;">Problemstellung</dt>
+        <dd style="margin:0.2em 0 1em 0; white-space:pre-wrap;">{{ research.problem }}</dd>
+    </dl>
+    {% endif %}
+    {% if research.goal %}
+    <dl>
+        <dt style="font-weight:bold; color:#555; font-size:0.85em;">Zielsetzung</dt>
+        <dd style="margin:0.2em 0 1em 0; white-space:pre-wrap;">{{ research.goal }}</dd>
+    </dl>
+    {% endif %}
+    {% if research.methodology %}
+    <dl>
+        <dt style="font-weight:bold; color:#555; font-size:0.85em;">Methodik und Vorgehensweise</dt>
+        <dd style="margin:0.2em 0 1em 0; white-space:pre-wrap;">{{ research.methodology }}</dd>
+    </dl>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if match_wishes %}
+<div class="card" style="margin-top:1.5rem;">
+    <h3>Betreuerwünsche</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Von</th>
+                <th>Gewünschter Betreuer</th>
+                <th>Priorität</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for wish in match_wishes %}
+            <tr>
+                <td>{{ wish.person_from.get_full_name|default:"–" }}</td>
+                <td>{{ wish.personnel_who.person.get_full_name|default:"–" }}</td>
+                <td>{{ wish.priority|default:"–" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% endblock %}

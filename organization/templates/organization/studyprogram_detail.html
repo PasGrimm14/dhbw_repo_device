@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ program.study_progr }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>📖 {{ program.study_progr }}</h2>
+
+<div class="card">
+    <h3>Studienrichtungen ({{ fields.count }})</h3>
+    
+    {% if fields %}
+    <table>
+        <thead>
+            <tr>
+                <th>Studienrichtung</th>
+                <th>Anzahl Kurse</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for field in fields %}
+            <tr>
+                <td>{{ field.studyfield }}</td>
+                <td><span class="badge">{{ field.courses.count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:field_detail' field.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Studienrichtungen für diesen Studiengang.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:program_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

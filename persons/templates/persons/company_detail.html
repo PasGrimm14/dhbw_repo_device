@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>🏢 {{ company.name }}</h2>
+
+<div class="card">
+    <h3>Unternehmensdaten</h3>
+    <div class="info-grid">
+        {% if company.company_nr %}
+        <div class="info-item">
+            <label>Unternehmensnummer</label>
+            <div>{{ company.company_nr }}</div>
+        </div>
+        {% endif %}
+        <div class="info-item">
+            <label>Adressform</label>
+            <div>{{ company.adressform }}</div>
+        </div>
+        <div class="info-item">
+            <label>Name</label>
+            <div>{{ company.name }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Adresse</h3>
+    <div class="info-grid">
+        {% if company.street %}
+        <div class="info-item">
+            <label>Straße</label>
+            <div>{{ company.street }}</div>
+        </div>
+        {% endif %}
+        {% if company.district %}
+        <div class="info-item">
+            <label>Bezirk/Ortsteil</label>
+            <div>{{ company.district }}</div>
+        </div>
+        {% endif %}
+        {% if company.postal_code %}
+        <div class="info-item">
+            <label>PLZ</label>
+            <div>{{ company.postal_code }}</div>
+        </div>
+        {% endif %}
+        {% if company.city %}
+        <div class="info-item">
+            <label>Stadt</label>
+            <div>{{ company.city }}</div>
+        </div>
+        {% endif %}
+        {% if company.state %}
+        <div class="info-item">
+            <label>Bundesland</label>
+            <div>{{ company.state }}</div>
+        </div>
+        {% endif %}
+        {% if company.country %}
+        <div class="info-item">
+            <label>Land</label>
+            <div>{{ company.country }}</div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if company.get_full_address %}
+    <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+        <strong>Vollständige Adresse:</strong><br>
+        {{ company.get_full_address }}
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Kontaktdaten</h3>
+    <div class="info-grid">
+        {% if company.tel_main %}
+        <div class="info-item">
+            <label>Telefon</label>
+            <div><a href="tel:{{ company.tel_main }}">{{ company.tel_main }}</a></div>
+        </div>
+        {% endif %}
+        {% if company.mail_main %}
+        <div class="info-item">
+            <label>Haupt-E-Mail</label>
+            <div><a href="mailto:{{ company.mail_main }}">{{ company.mail_main }}</a></div>
+        </div>
+        {% endif %}
+        {% if company.mail_person %}
+        <div class="info-item">
+            <label>Ansprechpartner-E-Mail</label>
+            <div><a href="mailto:{{ company.mail_person }}">{{ company.mail_person }}</a></div>
+        </div>
+        {% endif %}
+        {% if company.webpage %}
+        <div class="info-item">
+            <label>Webseite</label>
+            <div><a href="{{ company.webpage }}" target="_blank">{{ company.webpage }} 🔗</a></div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if not company.has_contact_info %}
+    <p style="color: #999; font-style: italic;">Keine Kontaktdaten hinterlegt.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Studenten bei diesem Unternehmen ({{ students.count }})</h3>
+    
+    {% if students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Matrikel-Nr.</th>
+                <th>Name</th>
+                <th>E-Mail</th>
+                <th>Kurs</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.matri_nr }}</td>
+                <td>{{ student.person.get_full_name }}</td>
+                <td>
+                    {% if student.person.mail_main %}
+                    <a href="mailto:{{ student.person.mail_main }}">{{ student.person.mail_main }}</a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>{{ student.course }}</td>
+                <td>
+                    <a href="{% url 'persons:student_detail' student.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Studenten bei diesem Unternehmen.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'persons:company_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

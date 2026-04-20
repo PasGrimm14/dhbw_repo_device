@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ module.module_nr }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>📖 {{ module.module_nr }} - {{ module.name }}</h2>
+
+<div class="card">
+    <h3>Modulinformationen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Modulnummer</label>
+            <div><strong>{{ module.module_nr }}</strong></div>
+        </div>
+        <div class="info-item">
+            <label>Modulname</label>
+            <div>{{ module.name }}</div>
+        </div>
+        <div class="info-item">
+            <label>Credits</label>
+            <div><span class="badge">{{ module.credits }} ECTS</span></div>
+        </div>
+        <div class="info-item">
+            <label>Studiengang</label>
+            <div>{{ module.study.study_progr }}</div>
+        </div>
+        {% if module.field %}
+        <div class="info-item">
+            <label>Studienrichtung</label>
+            <div>{{ module.field.studyfield }}</div>
+        </div>
+        {% endif %}
+        <div class="info-item">
+            <label>Anzahl Veranstaltungen</label>
+            <div><span class="badge">{{ units.count }}</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Lehrveranstaltungen ({{ units.count }})</h3>
+    {% if units %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nr.</th>
+                <th>Name</th>
+                <th>Kurzname</th>
+                <th>Einheiten</th>
+                <th>Semester</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for unit in units %}
+            <tr>
+                <td>{{ unit.unit_nr }}</td>
+                <td>{{ unit.unit_name }}</td>
+                <td><strong>{{ unit.unit_name_short|default:"-" }}</strong></td>
+                <td>{{ unit.units }}</td>
+                <td>{{ unit.semester_nr }}. Semester</td>
+                <td>
+                    <a href="{% url 'lectures:unit_detail' unit.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Lehrveranstaltungen für dieses Modul.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Noten-Statistik</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Anzahl Noten</label>
+            <div><span class="badge">{{ grade_stats.count }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>Durchschnittsnote</label>
+            <div>
+                {% if grade_stats.avg %}
+                <strong>{{ grade_stats.avg|floatformat:2 }}</strong>
+                {% else %}
+                -
+                {% endif %}
+            </div>
+        </div>
+        <div class="info-item">
+            <label>Bestanden</label>
+            <div><span class="badge" style="background: #27ae60;">{{ grade_stats.num_passed }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>Nicht bestanden</label>
+            <div><span class="badge" style="background: #e74c3c;">{{ grade_stats.num_failed }}</span></div>
+        </div>
+    </div>
+</div>
+
+{% if grades %}
+<div class="card">
+    <h3>Letzte Noten (Top 20)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Matrikel-Nr.</th>
+                <th>Note</th>
+                <th>Status</th>
+                <th>Versuch</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>{{ grade.student.person.get_full_name }}</td>
+                <td>{{ grade.student.matri_nr }}</td>
+                <td><strong>{{ grade.grade }}</strong></td>
+                <td>
+                    {% if grade.passed %}
+                    <span class="badge" style="background: #27ae60;">✓ Bestanden</span>
+                    {% else %}
+                    <span class="badge" style="background: #e74c3c;">✗ Nicht bestanden</span>
+                    {% endif %}
+                </td>
+                <td>{{ grade.attempt }}. Versuch</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'lectures:module_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

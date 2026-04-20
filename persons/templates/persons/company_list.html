@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Unternehmen - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Unternehmen</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Name, Stadt oder PLZ..." value="{{ search_query }}">
+            <input type="text" name="city" placeholder="Stadt..." value="{{ city_filter }}" style="width: 150px;">
+            <input type="text" name="state" placeholder="Bundesland..." value="{{ state_filter }}" style="width: 150px;">
+            <select name="has_students">
+                <option value="">Alle</option>
+                <option value="yes" {% if has_students_filter == 'yes' %}selected{% endif %}>Mit Studenten</option>
+                <option value="no" {% if has_students_filter == 'no' %}selected{% endif %}>Ohne Studenten</option>
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'persons:company_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <p>
+            <strong>Gesamt:</strong> {{ total_companies }} Unternehmen | 
+            <strong>Mit Studenten:</strong> {{ companies_with_students }}
+        </p>
+    </div>
+    
+    {% if companies %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Stadt</th>
+                <th>Bundesland</th>
+                <th>Telefon</th>
+                <th>E-Mail</th>
+                <th>Studenten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td><strong>{{ company.name }}</strong></td>
+                <td>{{ company.get_short_address }}</td>
+                <td>{{ company.state|default:"-" }}</td>
+                <td>{{ company.tel_main|default:"-" }}</td>
+                <td>
+                    {% if company.mail_main %}
+                    <a href="mailto:{{ company.mail_main }}">{{ company.mail_main }}</a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if company.num_students > 0 %}
+                    <span class="badge">{{ company.num_students }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'persons:company_detail' company.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Unternehmen gefunden.</p>
+    {% endif %}
+</div>
+{% endblock %}

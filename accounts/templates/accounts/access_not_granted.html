@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Zugriff noch nicht freigegeben – SG-Verwaltung{% endblock %}
+
+{% block content %}
+<div style="text-align:center; padding:4rem 1rem;">
+    <div style="font-size:5rem; margin-bottom:1rem;">⏳</div>
+    <h1 style="font-size:2.5rem; color:#2c3e50; margin-bottom:0.5rem;">Zugriff noch nicht freigegeben</h1>
+
+    {% if reason == 'no_person' %}
+    <h2 style="font-size:1.1rem; color:#555; font-weight:400; margin-bottom:1.5rem;">
+        Kein Personendatensatz gefunden
+    </h2>
+    <p style="color:#777; max-width:480px; margin:0 auto 2rem;">
+        Ihr Benutzerkonto (<strong>{{ request.user.email }}</strong>) konnte keinem Personendatensatz
+        im System zugeordnet werden. Bitte wenden Sie sich an den Administrator, damit Ihr
+        Konto korrekt eingerichtet werden kann.
+    </p>
+
+    {% elif reason == 'no_personnel' %}
+    <h2 style="font-size:1.1rem; color:#555; font-weight:400; margin-bottom:1.5rem;">
+        Mitarbeitendenprofil noch nicht angelegt
+    </h2>
+    <p style="color:#777; max-width:480px; margin:0 auto 2rem;">
+        Ihr Benutzerkonto ist als Mitarbeitende/r angelegt, jedoch wurde noch kein
+        Mitarbeitendenprofil für Sie erstellt. Bitte wenden Sie sich an den Administrator.
+    </p>
+
+    {% elif reason == 'no_student' %}
+    <h2 style="font-size:1.1rem; color:#555; font-weight:400; margin-bottom:1.5rem;">
+        Studierendenprofil noch nicht angelegt
+    </h2>
+    <p style="color:#777; max-width:480px; margin:0 auto 2rem;">
+        Ihr Benutzerkonto ist als Studierende/r angelegt, jedoch wurde noch kein
+        Studierendenprofil für Sie erstellt. Bitte wenden Sie sich an den Administrator.
+    </p>
+
+    {% else %}
+    <h2 style="font-size:1.1rem; color:#555; font-weight:400; margin-bottom:1.5rem;">
+        Ihr Konto ist noch nicht vollständig eingerichtet
+    </h2>
+    <p style="color:#777; max-width:480px; margin:0 auto 2rem;">
+        Bitte wenden Sie sich an den Administrator, damit Ihr Zugang freigeschaltet werden kann.
+    </p>
+    {% endif %}
+
+</div>
+{% endblock %}

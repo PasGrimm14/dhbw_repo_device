@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.course_nr }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>👥 {{ course.course_nr }}</h2>
+
+<div class="card">
+    <h3>Kursinformationen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Kursnummer</label>
+            <div><strong>{{ course.course_nr }}</strong></div>
+        </div>
+        <div class="info-item">
+            <label>Akademie</label>
+            <div>
+                <a href="{% url 'organization:academy_detail' course.academy.id %}">
+                    {{ course.academy.academy_name }}
+                </a>
+            </div>
+        </div>
+        <div class="info-item">
+            <label>Studienrichtung</label>
+            <div>
+                {% if course.field %}
+                <a href="{% url 'organization:field_detail' course.field.id %}">
+                    {{ course.field }}
+                </a>
+                {% else %}
+                -
+                {% endif %}
+            </div>
+        </div>
+        <div class="info-item">
+            <label>Jahrgang</label>
+            <div>
+                <!-- <a href="{% url 'organization:year_detail' course.academic_year.id %}"> -->
+                {{ course.academic_year.year_name }}
+            </div>
+        </div>
+        <div class="info-item">
+            <label>Organisation</label>
+            <div>{{ course.organisation.name }}</div>
+        </div>
+        <div class="info-item">
+            <label>Anzahl Studenten</label>
+            <div><span class="badge">{{ students.count }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>iCal Link</label>
+            <div>
+                {% if can_edit %}
+                <form method="post" action="{% url 'organization:course_update_ical' course.pk %}" style="display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+                    {% csrf_token %}
+                    <input type="url" name="external_ical_url" value="{{ course.external_ical_url|default:'' }}"
+                           placeholder="https://…" style="flex:1; min-width:200px;">
+                    <button type="submit" class="btn btn-secondary" style="white-space:nowrap;">Speichern</button>
+                </form>
+                {% if course.external_ical_last_sync_at %}
+                <small style="color:#95a5a6;">Stand: {{ course.external_ical_last_sync_at|date:"d.m.Y H:i" }}</small>
+                {% endif %}
+                {% else %}
+                {% if course.external_ical_url %}
+                <span class="badge">{{ course.external_ical_url }}</span>
+                {% if course.external_ical_last_sync_at %}
+                <small style="color:#95a5a6;">(Stand: {{ course.external_ical_last_sync_at|date:"d.m.Y H:i" }})</small>
+                {% endif %}
+                {% else %}
+                <span style="color:#95a5a6;">-</span>
+                {% endif %}
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<div style="margin-bottom:1rem;">
+    <a href="{% url 'lectures:course_schedule' course.pk %}" class="btn">🗓 Stundenplan ansehen</a>
+</div>
+
+{% if current_semester %}
+<div class="card">
+    <h3>Aktuelles Semester</h3>
+    {% if current_semester %}
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Semester</label>
+            <div><strong>{{ current_semester.name_short }}</strong></div>
+        </div>
+        <div class="info-item">
+            <label>Typ</label>
+            <div><span class="badge">{{ current_semester.get_type_display }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>Zeitraum</label>
+            <div>{{ current_semester.start_date|date:"d.m.Y" }} - {{ current_semester.end_date|date:"d.m.Y" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Status</label>
+            <div><span class="badge" style="background: #27ae60;">✓ Läuft</span></div>
+        </div>
+    </div>
+    {% else %}
+    <p style="color: #95a5a6; font-style: italic;">Aktuell läuft kein Semester für diesen Kurs.</p>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if semesters %}
+<div class="card">
+    <h3>Semester-Übersicht</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.5rem;">
+        {% for semester in semesters %}
+        <div style="padding: 0.5rem; background: {% if semester.is_active %}#d4edda{% else %}#f8f9fa{% endif %}; border-radius: 4px; text-align: center;">
+            <strong>{{ semester.name_short }}</strong><br>
+            <small>{{ semester.get_type_display }}</small>
+            {% if semester.is_active %}
+            <br><span style="color: #27ae60; font-size: 0.8rem;">✓ Aktiv</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <h3>Studenten in diesem Kurs ({{ students.count }})</h3>
+    
+    {% if students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Matrikel-Nr.</th>
+                <th>Name</th>
+                <th>E-Mail</th>
+                <th>Unternehmen</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.matri_nr }}</td>
+                <td>{{ student.person.get_full_name }}</td>
+                <td>
+                    {% if student.person.mail_main %}
+                    <a href="mailto:{{ student.person.mail_main }}">{{ student.person.mail_main }}</a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>{{ student.company.name }}</td>
+                <td>
+                    <a href="{% url 'persons:student_detail' student.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Studenten in diesem Kurs.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:course_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Noten - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>🎓 Noten</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Student, Matrikel-Nr. oder Modul..." value="{{ request.GET.search }}">
+            <select name="passed">
+                <option value="">Alle</option>
+                <option value="yes" {% if request.GET.passed == 'yes' %}selected{% endif %}>Nur Bestandene</option>
+                <option value="no" {% if request.GET.passed == 'no' %}selected{% endif %}>Nur Nicht Bestandene</option>
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'lectures:grade_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if grades %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Matrikel-Nr.</th>
+                <th>Modul</th>
+                <th>Veranstaltung</th>
+                <th>Note</th>
+                <th>Status</th>
+                <th>Versuch</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+            <tr>
+                <td>
+                    <a href="{% url 'lectures:student_grades' grade.student.id %}">
+                        {{ grade.student.person.get_full_name }}
+                    </a>
+                </td>
+                <td>{{ grade.student.matri_nr }}</td>
+                <td>
+                    <a href="{% url 'lectures:module_detail' grade.module.id %}">
+                        {{ grade.module.module_nr }}
+                    </a>
+                </td>
+                <td>
+                    {% if grade.unit %}
+                    <a href="{% url 'lectures:unit_detail' grade.unit.id %}">
+                        {{ grade.unit.unit_name_short|default:grade.unit.unit_name }}
+                    </a>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td><strong style="font-size: 1.1rem;">{{ grade.grade }}</strong></td>
+                <td>
+                    {% if grade.passed %}
+                    <span class="badge" style="background: #27ae60;">✓ Bestanden</span>
+                    {% else %}
+                    <span class="badge" style="background: #e74c3c;">✗ Nicht bestanden</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {{ grade.attempt }}. Versuch
+                    {% if grade.is_final_attempt and not grade.passed %}
+                    <span style="color: #e74c3c; font-weight: bold;">⚠ Endgültig</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Noten gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'lectures:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

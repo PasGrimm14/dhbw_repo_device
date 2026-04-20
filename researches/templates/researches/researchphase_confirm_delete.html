@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Phase löschen: {{ phase.name }}{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+    <a href="{% url 'researches:researchphase_detail' phase.pk %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">← Zurück</a>
+    <h2 style="margin:0;">Phase löschen</h2>
+</div>
+
+<div class="card">
+    <p>Soll die Forschungsphase <strong>„{{ phase.name }}"</strong> wirklich gelöscht werden?</p>
+
+    {% with count=phase.researches.count %}
+    {% if count %}
+    <p style="color:#e74c3c;">
+        Achtung: Dieser Phase sind aktuell <strong>{{ count }} Forschungsarbeit{{ count|pluralize:"en" }}</strong> zugeordnet.
+        Die Zuordnung wird auf „–" gesetzt (SET_NULL).
+    </p>
+    {% endif %}
+    {% endwith %}
+
+    <form method="post" style="display:flex; gap:0.75rem; margin-top:1rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="background:#e74c3c;">Ja, löschen</button>
+        <a href="{% url 'researches:researchphase_detail' phase.pk %}" class="btn" style="background:#888;">Abbrechen</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Studiengänge - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Studiengänge</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Studiengang..." value="{{ request.GET.search }}">
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'organization:program_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if programs %}
+    <table>
+        <thead>
+            <tr>
+                <th>Studiengang</th>
+                <th>Anzahl Studienrichtungen</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for program in programs %}
+            <tr>
+                <td><strong>{{ program.study_progr }}</strong></td>
+                <td><span class="badge">{{ program.field_count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:program_detail' program.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Studiengänge gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ academy.academy_name }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>🏫 {{ academy.academy_name }}</h2>
+
+<div class="card">
+    <h3>Kurse an dieser Akademie ({{ courses.count }})</h3>
+    
+    {% if courses %}
+    <table>
+        <thead>
+            <tr>
+                <th>Kurs-Nr.</th>
+                <th>Studienrichtung</th>
+                <th>Jahrgang</th>
+                <th>Studenten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td><strong>{{ course.course_nr }}</strong></td>
+                <td>{{ course.field|default:"-" }}</td>
+                <td>{{ course.academic_year.year_name }}</td>
+                <td><span class="badge">{{ course.students.count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:course_detail' course.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Kurse an dieser Akademie.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:academy_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

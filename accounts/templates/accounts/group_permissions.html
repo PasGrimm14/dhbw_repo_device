@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} – SG-Verwaltung{% endblock %}
+
+{% block content %}
+<div style="max-width:750px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2>{{ title }}</h2>
+        <a href="{% url 'accounts:group_list' %}" class="btn btn-secondary">← Zurück</a>
+    </div>
+
+    <p style="color:#555; margin-bottom:1.5rem;">
+        Aktivierte Berechtigungen gelten für alle Benutzer, die dieser Gruppe angehören.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for app, perms in perms_by_app.items %}
+        <div class="card" style="margin-bottom:1rem;">
+            <h3 style="font-size:1rem; text-transform:capitalize; margin-bottom:1rem; color:#2c3e50; border-bottom:1px solid #eee; padding-bottom:0.5rem;">
+                {{ app }}
+            </h3>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:0.4rem;">
+                {% for perm in perms %}
+                <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; padding:0.35rem 0.5rem; border-radius:4px; font-size:0.88rem;">
+                    <input type="checkbox"
+                           name="permissions"
+                           value="{{ perm.pk }}"
+                           {% if perm in object.permissions.all %}checked{% endif %}>
+                    <span>
+                        <span style="color:#888; font-size:0.78rem;">{{ perm.content_type.model }}</span>
+                        <span style="display:block; font-weight:500;">{{ perm.name }}</span>
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+            <button type="submit" class="btn">Speichern</button>
+            <a href="{% url 'accounts:group_list' %}" class="btn btn-secondary">Abbrechen</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

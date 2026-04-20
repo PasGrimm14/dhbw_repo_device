@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Phase bearbeiten{% else %}Neue Phase{% endif %}{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+    {% if form.instance.pk %}
+    <a href="{% url 'researches:researchphase_detail' form.instance.pk %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">← Zurück</a>
+    <h2 style="margin:0;">Phase bearbeiten: {{ form.instance.name }}</h2>
+    {% else %}
+    <a href="{% url 'researches:researchphase_list' %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">← Alle Phasen</a>
+    <h2 style="margin:0;">Neue Forschungsphase</h2>
+    {% endif %}
+</div>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <table>
+            {% for field in form %}
+            <tr>
+                <th style="width:200px;">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                </th>
+                <td>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small style="color:#888; display:block; margin-top:0.25rem;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <small style="color:#e74c3c; display:block;">{{ error }}</small>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% if form.non_field_errors %}
+        <div style="color:#e74c3c; margin-top:0.75rem;">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h3 style="margin-top:1.5rem; margin-bottom:0.5rem;">Kurszuweisungen</h3>
+        <p style="color:#888; font-size:0.9em; margin-bottom:0.75rem;">
+            Für welche Kurse gilt diese Phase als PA1, PA2 oder BA?
+        </p>
+        <table style="width:100%;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;">Kurs</th>
+                    <th style="text-align:center;">PA1</th>
+                    <th style="text-align:center;">PA2</th>
+                    <th style="text-align:center;">BA</th>
+                    <th style="text-align:center;">—</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in course_assignments %}
+                <tr {% if entry.locked %}style="opacity:0.5;" title="Kurs hat bereits Arbeiten in dieser Phase und kann nicht mehr geändert werden."{% endif %}>
+                    <td>
+                        {{ entry.course.course_nr }}{% if entry.course.field %} <small style="color:#888;">({{ entry.course.field.studyfield }})</small>{% endif %}
+                        {% if entry.locked %}<small style="color:#e67e22; display:block;">Arbeiten vorhanden – gesperrt</small>{% endif %}
+                    </td>
+                    <td style="text-align:center;">
+                        {% if entry.locked or 'PA1' in entry.blocked_types %}
+                        <input type="radio" name="course_{{ entry.course.pk }}_type" value="PA1" disabled
+                            {% if entry.current_type == 'PA1' %}checked{% endif %}>
+                        {% else %}
+                        <input type="radio" name="course_{{ entry.course.pk }}_type" value="PA1"
+                            {% if entry.current_type == 'PA1' %}checked{% endif %}>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center;">
+                        {% if entry.locked or 'PA2' in entry.blocked_types %}
+                        <input type="radio" name="course_{{ entry.course.pk }}_type" value="PA2" disabled
+                            {% if entry.current_type == 'PA2' %}checked{% endif %}>
+                        {% else %}
+                        <input type="radio" name="course_{{ entry.course.pk }}_type" value="PA2"
+                            {% if entry.current_type == 'PA2' %}checked{% endif %}>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center;">
+                        {% if entry.locked or 'BA' in entry.blocked_types %}
+                        <input type="radio" name="course_{{ entry.course.pk }}_type" value="BA" disabled
+                            {% if entry.current_type == 'BA' %}checked{% endif %}>
+                        {% else %}
+                        <input type="radio" name="course_{{ entry.course.pk }}_type" value="BA"
+                            {% if entry.current_type == 'BA' %}checked{% endif %}>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center;">
+                        <input type="radio" name="course_{{ entry.course.pk }}_type" value=""
+                            {% if entry.locked or not entry.current_type %}{% if not entry.current_type %}checked{% endif %}{% endif %}
+                            {% if entry.locked %}disabled{% endif %}>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="color:#888;">Keine Kurse vorhanden.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top:1.25rem; display:flex; gap:0.75rem;">
+            <button type="submit" class="btn">Speichern</button>
+            {% if form.instance.pk %}
+            <a href="{% url 'researches:researchphase_detail' form.instance.pk %}" class="btn" style="background:#888;">Abbrechen</a>
+            {% else %}
+            <a href="{% url 'researches:researchphase_list' %}" class="btn" style="background:#888;">Abbrechen</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

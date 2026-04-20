@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Akademien - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Akademien</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Akademie..." value="{{ request.GET.search }}">
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'organization:academy_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if academies %}
+    <table>
+        <thead>
+            <tr>
+                <th>Akademiename</th>
+                <th>Anzahl Kurse</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for academy in academies %}
+            <tr>
+                <td><strong>{{ academy.academy_name }}</strong></td>
+                <td><span class="badge">{{ academy.course_count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:academy_detail' academy.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Akademien gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

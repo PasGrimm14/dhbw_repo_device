@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ research.unit }} – Vorschau Themeneinreichung der {{ research.unit.unit_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Vorschau: Themeneinreichung der {{ research.unit.unit_name }}</h2>
+</div>
+<p class="page-subtitle">{{ research.unit.unit_name }} &mdash; Wirtschaftsinformatik DHBW Heilbronn</p>
+
+{% if research.topic_submitted_date %}
+<div class="card alert-success">
+    ✅ Sie haben ihr Themen am <strong>{{ research.topic_submitted_date|date:"d.m.Y" }}</strong> eingereicht.
+</div>
+{% endif %}
+
+<div class="info-grid">
+
+    {# ---- Persönliche Daten ---- #}
+    <div class="card">
+        <h3>Ihre Daten</h3>
+        <table>
+            <tr>
+                <th>Vorname</th>
+                <td>{{ student.person.firstname }}</td>
+            </tr>
+            <tr>
+                <th>Nachname</th>
+                <td>{{ student.person.lastname }}</td>
+            </tr>
+            <tr>
+                <th>Kurs</th>
+                <td>{{ student.course }}</td>
+            </tr>
+            <tr>
+                <th>Matrikelnummer</th>
+                <td>{{ student.matri_nr }}</td>
+            </tr>
+            <tr>
+                <th>DHBW-E-Mail</th>
+                <td>{{ student.person.mail_main|default:'-' }}</td>
+            </tr>
+        </table>
+    </div>
+
+    {# ---- Betriebliche Ausbildungsleitung (read-only) ---- #}
+    <div class="card">
+        <h3>Angaben zur betrieblichen Ausbildungsleitung</h3>
+        <table>
+            <tr>
+                <th>Dualer Partner</th>
+                <td>{{ student.company.name|default:'-' }}</td>
+            </tr>
+            <tr>
+                <th>Vorname</th>
+                <td>{{ student.company_person.firstname|default:'-' }}</td>
+            </tr>
+            <tr>
+                <th>Nachname</th>
+                <td>{{ student.company_person.lastname|default:'-' }}</td>
+            </tr>
+            <tr>
+                <th>Berufliche E-Mail</th>
+                <td>{{ student.company_person.mail_main|default:'-' }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+{# ---- Betriebliche Betreuung ---- #}
+<div class="card">
+    <h3>Angaben zur betrieblichen Betreuung der {{ research.unit.unit_name }}</h3>
+    <table>
+        <tr>
+            <th>Unternehmen der Betreuung</th>
+            <td>{{ research.company_context|default:"–" }}</td>
+        </tr>
+        {% if research.assessor_oper %}
+        <tr>
+            <th>Ansprache</th>
+            <td>{{ research.assessor_oper.salutation_short|default:"–" }}</td>
+        </tr>
+        <tr>
+            <th>Titel</th>
+            <td>{{ research.assessor_oper.title|default:"–" }}</td>
+        </tr>
+        <tr>
+            <th>Vorname</th>
+            <td>{{ research.assessor_oper.firstname }}</td>
+        </tr>
+        <tr>
+            <th>Nachname</th>
+            <td>{{ research.assessor_oper.lastname }}</td>
+        </tr>
+        <tr>
+            <th>E-Mail</th>
+            <td>{{ research.assessor_oper.mail_main|default:"–" }}</td>
+        </tr>
+        <tr>
+            <th>Telefon</th>
+            <td>{{ research.assessor_oper.tel_main|default:"–" }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="2" class="text-muted">Keine Angaben zur betrieblichen Betreuung vorhanden.</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th>Vom Betrieb genehmigt</th>
+            <td>
+                {% if research.approved_oper %}
+                <span class="badge badge-success">Genehmigt</span>
+                {% else %}
+                <span class="badge badge-neutral">Noch nicht genehmigt</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+
+{# ---- Wissenschaftliche Arbeit ---- #}
+<div class="card">
+    <h3>Angaben zur wissenschaftlichen Arbeit</h3>
+    <table>
+        <tr>
+            <th>Titel der Arbeit</th>
+            <td>{{ research.title|default:"–" }}</td>
+        </tr>
+        <tr>
+            <th>Problemstellung</th>
+            <td>{{ research.problem|default:"–" }}</td>
+        </tr>
+        <tr>
+            <th>Zielsetzung</th>
+            <td>{{ research.goal|default:"–" }}</td>
+        </tr>
+        <tr>
+            <th>Methodik und Vorgehensweise</th>
+            <td>{{ research.methodology|default:"–" }}</td>
+        </tr>
+    </table>
+</div>
+
+{# ---- Wunschbetreuung ---- #}
+{% if research.comment %}
+<div class="card">
+    <h3>Wissenschaftliche Wunschbetreuung</h3>
+    <table>
+        <tr>
+            <th>Wunschbetreuung</th>
+            <td>{{ research.comment }}</td>
+        </tr>
+    </table>
+</div>
+{% endif %}
+
+{# ---- Aktionen ---- #}
+<div class="card">
+    {% if research.topic_submitted_date %}
+        <!-- Einreichung abgeschlossen -->
+         <p class="text-muted">
+            Herzlichen Glückwunsch. Die Einreichung ist abgeschlossen. Änderungen sind nicht mehr möglich.
+        </p>
+
+        <div class="actions-row">
+            <a href="{% url 'researches:dashboard' %}" class="btn btn-back">
+                &larr; Zum Dashboard
+            </a>
+        </div>
+    {% elif research.topic_submit_deadline > today %}
+        <!-- Einreichung noch möglich -->
+        {% if research.check_submittable|length == 0 %}
+            <!-- Alle Angaben da - Einreichung möglich -->
+            <p>
+                Bitte überprüfen Sie Ihre Angaben sorgfältig. Mit einem Klick auf 
+                <strong>„Jetzt einreichen“</strong> wird Ihre Themeneinreichung verbindlich abgeschlossen.
+            </p>
+
+            <div class="actions-row">
+                <form method="post" class="form-inline">
+                    {% csrf_token %}
+                    <label class="toggle">
+                        <input type="checkbox" name="cb_send" required>
+                        Ich bin damit einverstanden, dass die von mir im Formular angegebenen Daten bei Bedarf an meine betriebliche Betreuung und Ausbildungsleitung weitergeleitet werden.
+                    </label>
+                    <label class="toggle">
+                        <input type="checkbox" name="cb_go" required>
+                        Hiermit reiche ich das Thema meiner {{ research.unit.unit_name }} verbindlich ein.
+                    </label>
+                    <p class="note">
+                        <strong>Hinweis:</strong> Nach der Einreichung sind keine Änderungen mehr möglich.
+                    </p>
+                    <button type="submit" name="action" value="submit" class="btn" style="background-color: green;">
+                        Jetzt einreichen
+                    </button>
+                </form>
+            </div>
+
+        {% else %}
+            <!-- Angaben fehlen - Einreichung nicht möglich -->
+            <p style="color: red; font-weight: bold;">Das Thema ist noch nicht einreichbar.</p>
+            <p>Folgende Angaben fehlen: {{ research.check_submittable|join:", " }}</p>
+        {% endif %}
+        
+        <p style="margin-top: 1em;">
+            Die First für die Einreichung ist der <strong>{{ research.topic_submit_deadline }}</strong>. Wenn bis dahin keine Einreichung erfolgt, gilt das Modul als nicht bestanden. 
+        </p>
+
+        <div class="actions-row">
+            <a href="{% url 'researches:research_form' research.pk %}" class="btn btn-back">
+                &larr; Zurück zum Formular
+            </a>
+        </div>
+    {% else %}
+        <!-- Einreichung verpasst -->
+        <p>Keine Einreichung mehr möglich. Frist hat am <strong>{{ research.topic_submit_deadline }}</strong> geendet.</p>
+    {% endif %}
+</div>
+<i style="color:grey; font-size: 0.5em;">Seite geöffnet am {{ time }}</i>
+
+{% endblock %}

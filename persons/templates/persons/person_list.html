@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Personen - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Personen</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Name oder E-Mail..." value="{{ search_query }}">
+            <select name="role">
+                <option value="">Alle Rollen</option>
+                {% for value, label in role_choices %}
+                <option value="{{ value }}" {% if current_role == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'persons:person_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if persons %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>E-Mail</th>
+                <th>Telefon</th>
+                <th>Rolle</th>
+                <th>Geschlecht</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for person in persons %}
+            <tr>
+                <td>{{ person.get_full_name }}</td>
+                <td>{{ person.mail_main|default:"-" }}</td>
+                <td>{{ person.tel_main|default:"-" }}</td>
+                <td><span class="badge">{{ person.get_role_now_display }}</span></td>
+                <td>{{ person.get_gender_display|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'persons:person_detail' person.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Personen gefunden.</p>
+    {% endif %}
+</div>
+{% endblock %}

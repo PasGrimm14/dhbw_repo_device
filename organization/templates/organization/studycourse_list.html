@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Kurse - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Kurse</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Kursnummer..." value="{{ request.GET.search }}">
+            <select name="academy">
+                <option value="">Alle Akademien</option>
+                {% for acad in academies %}
+                <option value="{{ acad.id }}" {% if request.GET.academy == acad.id|stringformat:"s" %}selected{% endif %}>
+                    {{ acad.academy_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="field">
+                <option value="">Alle Studienrichtungen</option>
+                {% for f in fields %}
+                <option value="{{ f.id }}" {% if request.GET.field == f.id|stringformat:"s" %}selected{% endif %}>
+                    {{ f.studyfield }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="year">
+                <option value="">Alle Jahrgänge</option>
+                {% for y in years %}
+                <option value="{{ y.id }}" {% if request.GET.year == y.id|stringformat:"s" %}selected{% endif %}>
+                    {{ y.year_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'organization:course_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if courses %}
+    <table>
+        <thead>
+            <tr>
+                <th>Kurs-Nr.</th>
+                <th>Akademie</th>
+                <th>Studienrichtung</th>
+                <th>Jahrgang</th>
+                <th>Organisation</th>
+                <th>Studenten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td><strong>{{ course.course_nr }}</strong></td>
+                <td>{{ course.academy.academy_name }}</td>
+                <td>{{ course.field|default:"-" }}</td>
+                <td>{{ course.academic_year.year_name }}</td>
+                <td>{{ course.organisation.name }}</td>
+                <td><span class="badge">{{ course.num_students }}</span></td>
+                <td>
+                    <a href="{% url 'organization:course_detail' course.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Kurse gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

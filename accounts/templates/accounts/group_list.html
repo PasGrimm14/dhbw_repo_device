@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Rechteverwaltung – SG-Verwaltung{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <h2>Rechteverwaltung (Gruppen)</h2>
+    <a href="{% url 'accounts:user_list' %}" class="btn btn-secondary">← Benutzerverwaltung</a>
+</div>
+
+<p style="color:#555; margin-bottom:1.5rem;">
+    Hier weisen Sie den Gruppen ihre Berechtigungen zu.
+    Eine Gruppe erhält eine Berechtigung → alle Benutzer in dieser Gruppe erhalten sie automatisch.
+</p>
+
+<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:1rem;">
+    {% for group in groups %}
+    <div class="card" style="margin-bottom:0;">
+        <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:0.75rem;">
+            <h3 style="font-size:1.1rem;">{{ group.name }}</h3>
+            <a href="{% url 'accounts:group_permissions' group.pk %}" class="btn" style="font-size:0.82rem; padding:0.25rem 0.65rem;">Bearbeiten</a>
+        </div>
+        <div style="font-size:0.82rem; color:#555;">
+            {% with count=group.permissions.count %}
+            <span>{{ count }} Recht{{ count|pluralize:"e" }} zugewiesen</span>
+            {% endwith %}
+        </div>
+        <div style="margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.25rem;">
+            {% for perm in group.permissions.all|slice:":8" %}
+            <span style="background:#eef2ff; color:#4a5568; border-radius:3px; padding:1px 5px; font-size:0.75rem;">{{ perm.codename }}</span>
+            {% endfor %}
+            {% if group.permissions.count > 8 %}
+            <span style="color:#888; font-size:0.75rem;">+{{ group.permissions.count|add:"-8" }} weitere</span>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p style="color:#888;">Keine Gruppen vorhanden.</p>
+    {% endfor %}
+</div>
+{% endblock %}

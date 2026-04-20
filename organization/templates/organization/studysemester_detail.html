@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ semester.name }} - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>📅 {{ semester.name }}</h2>
+
+<div class="card">
+    <h3>Semester-Informationen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Name</label>
+            <div>{{ semester.name }}</div>
+        </div>
+        <div class="info-item">
+            <label>Kurzname</label>
+            <div><strong>{{ semester.name_short }}</strong></div>
+        </div>
+        <div class="info-item">
+            <label>Typ</label>
+            <div><span class="badge">{{ semester.get_type_display }}</span></div>
+        </div>
+        <div class="info-item">
+            <label>Zyklus</label>
+            <div>{{ semester.get_cycle_display }}</div>
+        </div>
+        {% if semester.special %}
+        <div class="info-item">
+            <label>Besonderheit</label>
+            <div>{{ semester.get_special_display }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3>Zeitraum</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Startdatum</label>
+            <div>{{ semester.start_date|date:"d.m.Y" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Enddatum</label>
+            <div>{{ semester.end_date|date:"d.m.Y" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Dauer</label>
+            <div>{{ semester.duration_days }} Tage</div>
+        </div>
+        <div class="info-item">
+            <label>Status</label>
+            <div>
+                {% if semester.is_active %}
+                <span class="badge" style="background: #27ae60;">✓ Aktuell laufend</span>
+                {% else %}
+                <span class="badge" style="background: #95a5a6;">Nicht aktiv</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:semester_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

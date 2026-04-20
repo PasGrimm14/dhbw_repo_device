@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.person.get_full_name }} - Student Details{% endblock %}
+
+{% block content %}
+<h2>🎓 {{ student.person.get_full_name }}</h2>
+
+<div class="card">
+    <h3>Studierenden-Daten</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Matrikelnummer</label>
+            <div>{{ student.matri_nr }}</div>
+        </div>
+        <div class="info-item">
+            <label>Kurs</label>
+            <div>{{ student.course }}</div>
+        </div>
+        <div class="info-item">
+            <label>Studienrichtung</label>
+            <div>{{ student.field }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Persönliche Daten</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Name</label>
+            <div>{{ student.person.get_full_name }}</div>
+        </div>
+        {% if student.person.birthday %}
+        <div class="info-item">
+            <label>Geburtstag</label>
+            <div>{{ student.person.birthday|date:"d.m.Y" }}</div>
+        </div>
+        {% endif %}
+        {% if student.person.gender %}
+        <div class="info-item">
+            <label>Geschlecht</label>
+            <div>{{ student.person.get_gender_display }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3>Kontaktdaten</h3>
+    <div class="info-grid">
+        {% if student.person.mail_main %}
+        <div class="info-item">
+            <label>E-Mail</label>
+            <div><a href="mailto:{{ student.person.mail_main }}">{{ student.person.mail_main }}</a></div>
+        </div>
+        {% endif %}
+        {% if student.person.tel_main %}
+        <div class="info-item">
+            <label>Telefon</label>
+            <div><a href="tel:{{ student.person.tel_main }}">{{ student.person.tel_main }}</a></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3>Unternehmen</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Unternehmen</label>
+            <div>{{ student.company }}</div>
+        </div>
+        {% if student.company_person %}
+        <div class="info-item">
+            <label>Ansprechpartner</label>
+            <div>
+                <a href="{% url 'persons:person_detail' student.company_person.id %}">
+                    {{ student.company_person.get_full_name }}
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'persons:person_detail' student.person.id %}" class="btn">Person anzeigen</a>
+    <a href="{% url 'persons:student_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

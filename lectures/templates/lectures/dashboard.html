@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Lehrveranstaltungen & Noten Dashboard - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Lehrveranstaltungen & Noten Dashboard</h2>
+
+<div class="info-grid">
+    <div class="card">
+        <h3>Module</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_modules }}</p>
+        <a href="{% url 'lectures:module_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Lehrveranstaltungen</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_units }}</p>
+        <a href="{% url 'lectures:unit_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Noten (gesamt)</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_grades }}</p>
+        <a href="{% url 'lectures:grade_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+</div>
+
+<div class="info-grid" style="margin-top: 1.5rem;">
+    <div class="card">
+        <h3>Bestanden</h3>
+        <p style="font-size: 2rem; margin: 1rem 0; color: #27ae60;">{{ passed_grades }}</p>
+        <a href="{% url 'lectures:grade_list' %}?passed=yes" class="btn">Anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Nicht bestanden</h3>
+        <p style="font-size: 2rem; margin: 1rem 0; color: #e74c3c;">{{ failed_grades }}</p>
+        <a href="{% url 'lectures:grade_list' %}?passed=no" class="btn">Anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Durchschnittsnote</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">
+            {% if average_grade %}
+            {{ average_grade|floatformat:2 }}
+            {% else %}
+            -
+            {% endif %}
+        </p>
+        <small style="color: #666;">Nur bestandene Prüfungen</small>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 1.5rem;">
+    <h3>Zuletzt eingetragene Noten</h3>
+    {% if recent_grades %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Modul</th>
+                <th>Note</th>
+                <th>Status</th>
+                <th>Versuch</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in recent_grades %}
+            <tr>
+                <td>{{ grade.student.person.get_full_name }}</td>
+                <td>{{ grade.module.module_nr }} - {{ grade.module.name }}</td>
+                <td><strong>{{ grade.grade }}</strong></td>
+                <td>
+                    {% if grade.passed %}
+                    <span class="badge" style="background: #27ae60;">✓ Bestanden</span>
+                    {% else %}
+                    <span class="badge" style="background: #e74c3c;">✗ Nicht bestanden</span>
+                    {% endif %}
+                </td>
+                <td>{{ grade.attempt }}. Versuch</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Noch keine Noten eingetragen.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <h3>Schnellzugriff</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <a href="{% url 'lectures:module_list' %}" class="btn">📖 Module</a>
+        <a href="{% url 'lectures:unit_list' %}" class="btn">📝 Lehrveranstaltungen</a>
+        <a href="{% url 'lectures:grade_list' %}" class="btn">🎓 Noten</a>
+    </div>
+</div>
+{% endblock %}

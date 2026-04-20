@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ personnel.person.get_full_name }} - Personal Details{% endblock %}
+
+{% block content %}
+<h2>👨‍🏫 {{ personnel.person.get_full_name }}</h2>
+
+<div class="card">
+    <h3>Personal-Daten</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Personalnummer</label>
+            <div>{{ personnel.personnel_nr|default:"-" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Aktantentyp</label>
+            <div>{{ personnel.actant_type }}</div>
+        </div>
+        <div class="info-item">
+            <label>Rolle</label>
+            <div><span class="badge">{{ personnel.person.get_role_now_display }}</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Persönliche Daten</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Name</label>
+            <div>{{ personnel.person.get_full_name }}</div>
+        </div>
+        {% if personnel.person.title %}
+        <div class="info-item">
+            <label>Titel</label>
+            <div>{{ personnel.person.title }}</div>
+        </div>
+        {% endif %}
+        {% if personnel.person.birthday %}
+        <div class="info-item">
+            <label>Geburtstag</label>
+            <div>{{ personnel.person.birthday|date:"d.m.Y" }}</div>
+        </div>
+        {% endif %}
+        {% if personnel.person.gender %}
+        <div class="info-item">
+            <label>Geschlecht</label>
+            <div>{{ personnel.person.get_gender_display }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h3>Kontaktdaten</h3>
+    <div class="info-grid">
+        {% if personnel.person.mail_main %}
+        <div class="info-item">
+            <label>E-Mail</label>
+            <div><a href="mailto:{{ personnel.person.mail_main }}">{{ personnel.person.mail_main }}</a></div>
+        </div>
+        {% endif %}
+        {% if personnel.person.tel_main %}
+        <div class="info-item">
+            <label>Telefon</label>
+            <div><a href="tel:{{ personnel.person.tel_main }}">{{ personnel.person.tel_main }}</a></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'persons:person_detail' personnel.person.id %}" class="btn">Person anzeigen</a>
+    <a href="{% url 'persons:personnel_list' %}" class="btn btn-secondary">← Zurück zur Liste</a>
+</div>
+{% endblock %}

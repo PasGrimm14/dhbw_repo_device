@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Forschungsarbeiten{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+    <h2>Forschungsarbeiten</h2>
+</div>
+
+<div class="card" style="margin-bottom:1rem;">
+    <form method="get" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
+        <div>
+            <label for="search" style="display:block; font-weight:bold; margin-bottom:0.3em;">Suche</label>
+            <input type="text" id="search" name="search" value="{{ request.GET.search }}"
+                placeholder="Titel, Name, Matrikelnummer" style="padding:0.4em 0.6em; border:1px solid #ccc; border-radius:4px;">
+        </div>
+        <div>
+            <label for="status" style="display:block; font-weight:bold; margin-bottom:0.3em;">Status</label>
+            <select id="status" name="status" style="padding:0.4em 0.6em; border:1px solid #ccc; border-radius:4px;">
+                <option value="">Alle</option>
+                <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Genehmigt</option>
+                <option value="not_approved" {% if request.GET.status == 'not_approved' %}selected{% endif %}>Nicht genehmigt</option>
+                <option value="submitted" {% if request.GET.status == 'submitted' %}selected{% endif %}>Thema eingereicht</option>
+                <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Bearbeitung</option>
+                <option value="overdue" {% if request.GET.status == 'overdue' %}selected{% endif %}>Abgelaufen</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Filtern</button>
+        {% if request.GET.search or request.GET.status %}
+        <a href="{% url 'researches:research_list' %}" class="btn" style="background:#6c757d;">Zurücksetzen</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="card">
+    {% if researches %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Titel</th>
+                <th>Veranstaltung</th>
+                <th>Wiss. Betreuer</th>
+                <th>Start</th>
+                <th>Abgabe</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for research in researches %}
+            <tr>
+                <td>{{ research.student.person.get_full_name }}</td>
+                <td>{{ research.title|default:"(Kein Titel)" }}</td>
+                <td>{{ research.unit.unit_name_short|default:research.unit.unit_name }}</td>
+                <td>{{ research.assessor_scien.person.get_short_name|default:"–" }}</td>
+                <td>{{ research.start_date|date:"d.m.Y" }}</td>
+                <td>{{ research.end_date|date:"d.m.Y" }}</td>
+                <td><span class="badge">{{ research.status_display }}</span></td>
+                <td>
+                    <a href="{% url 'researches:research_detail' research.pk %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+    <div style="margin-top:1rem; display:flex; gap:0.5rem; align-items:center;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">‹ Zurück</a>
+        {% endif %}
+        <span>Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Weiter ›</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <p>Keine Forschungsarbeiten gefunden.</p>
+    {% endif %}
+</div>
+{% endblock %}

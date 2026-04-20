@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Mein Profil{% endblock %}
+
+{% block content %}
+
+<!-- Hallo {{ user.get_full_name|default:user.username }} -->
+
+<div class="info-grid">
+    
+    <div class="card">
+        <h3>Meine Infos</h3>
+        <p>Person: {{ request.user.person }}</p>
+        {% if user_roles.employee %}
+            <p>Personnel: {{ request.user.person.personnel_profile }} </p>
+            <p>Organisationen: 
+                {% for org in request.user.person.personnel_profile.organisations.all %}
+                    {{ org.name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    Keine Organisationen
+                {% endfor %}
+            </p>
+        {% endif %}
+        {% if user_roles.student %}
+            <p>Matrikelnummer: {{ request.user.person.student_profile.matri_nr }} </p>
+            <p>Kurs: {{ request.user.person.student_profile.course }} </p>
+            <p>Studiengang: {{ request.user.person.student_profile.course.field }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h3>Meine Kurse</h3>
+        {% for course in request.user.person.get_study_courses_with_roles %}
+        <p>
+            {% if user_roles.employee %} 
+            <a href="{% url 'organization:course_detail' course.course.id %}" class=""> 
+                {{ course.course }} als {{ course.role }}
+            </a>
+            {% else %}
+            {{ course.course }} als {{ course.role }}
+            {% endif %}
+        </p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Gruppen</h3>
+        {% for group in request.user.groups.all %}
+            <p>{{ group.name }}</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

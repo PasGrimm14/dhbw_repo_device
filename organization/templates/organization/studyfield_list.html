@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Studienrichtungen - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Studienrichtungen</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Studienrichtung..." value="{{ request.GET.search }}">
+            <select name="program">
+                <option value="">Alle Studiengänge</option>
+                {% for prog in programs %}
+                <option value="{{ prog.id }}" {% if request.GET.program == prog.id|stringformat:"s" %}selected{% endif %}>
+                    {{ prog.study_progr }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'organization:field_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if fields %}
+    <table>
+        <thead>
+            <tr>
+                <th>Studienrichtung</th>
+                <th>Studiengang</th>
+                <th>Anzahl Kurse</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for field in fields %}
+            <tr>
+                <td><strong>{{ field.studyfield }}</strong></td>
+                <td>{{ field.study.study_progr }}</td>
+                <td><span class="badge">{{ field.course_count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:field_detail' field.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Studienrichtungen gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

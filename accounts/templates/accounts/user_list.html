@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Benutzerverwaltung – SG-Verwaltung{% endblock %}
+
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+    <h2>Benutzerverwaltung</h2>
+    <div style="display:flex; gap:0.75rem;">
+        <a href="{% url 'accounts:group_list' %}" class="btn btn-secondary">Rechteverwaltung</a>
+        <a href="{% url 'accounts:user_create' %}" class="btn">+ Neuer Benutzer</a>
+    </div>
+</div>
+
+<div class="card">
+    <table style="width:100%; border-collapse:collapse;">
+        <thead>
+            <tr style="border-bottom:2px solid #e0e0e0; text-align:left;">
+                <th style="padding:0.6rem 0.75rem;">Benutzername</th>
+                <th style="padding:0.6rem 0.75rem;">Name</th>
+                <th style="padding:0.6rem 0.75rem;">E-Mail</th>
+                <th style="padding:0.6rem 0.75rem;">Gruppen</th>
+                <th style="padding:0.6rem 0.75rem;">Person verknüpft</th>
+                <th style="padding:0.6rem 0.75rem;">Status</th>
+                <th style="padding:0.6rem 0.75rem;">Aktionen</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for u in users %}
+            <tr style="border-bottom:1px solid #f0f0f0;">
+                <td style="padding:0.6rem 0.75rem; font-weight:600;">
+                    {{ u.username }}
+                    {% if u.is_superuser %}<span style="font-size:0.7rem; background:#e74c3c; color:white; border-radius:3px; padding:1px 5px; margin-left:4px;">Superuser</span>{% endif %}
+                    {% if u.is_staff and not u.is_superuser %}<span style="font-size:0.7rem; background:#e67e22; color:white; border-radius:3px; padding:1px 5px; margin-left:4px;">Staff</span>{% endif %}
+                </td>
+                <td style="padding:0.6rem 0.75rem;">{{ u.get_full_name|default:"–" }}</td>
+                <td style="padding:0.6rem 0.75rem;">{{ u.email|default:"–" }}</td>
+                <td style="padding:0.6rem 0.75rem;">
+                    {% for g in u.groups.all %}
+                        <span style="display:inline-block; background:#e8f4f8; color:#2c3e50; border-radius:3px; padding:1px 6px; font-size:0.82rem; margin:1px;">{{ g.name }}</span>
+                    {% empty %}
+                        <span style="color:#aaa; font-size:0.85rem;">keine</span>
+                    {% endfor %}
+                </td>
+                <td style="padding:0.6rem 0.75rem;">
+                    {% if u.person %}
+                        <span style="color:#27ae60;">✓ {{ u.person.get_short_name }}</span>
+                    {% else %}
+                        <span style="color:#e74c3c;">✗ nicht verknüpft</span>
+                    {% endif %}
+                </td>
+                <td style="padding:0.6rem 0.75rem;">
+                    {% if u.is_active %}
+                        <span style="color:#27ae60;">Aktiv</span>
+                    {% else %}
+                        <span style="color:#e74c3c;">Inaktiv</span>
+                    {% endif %}
+                </td>
+                <td style="padding:0.6rem 0.75rem;">
+                    <a href="{% url 'accounts:user_edit' u.pk %}" class="btn btn-secondary" style="font-size:0.8rem; padding:0.25rem 0.6rem;">Bearbeiten</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="7" style="padding:1rem; text-align:center; color:#888;">Keine Benutzer vorhanden.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

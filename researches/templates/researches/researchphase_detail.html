@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Phase: {{ phase.name }}{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+    <a href="{% url 'researches:researchphase_list' %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">← Alle Phasen</a>
+    <h2 style="margin:0;">{{ phase.name }}</h2>
+    <span class="badge">{{ phase.status_display }}</span>
+</div>
+
+<div class="info-grid">
+    <div class="card">
+        <h3>Termine</h3>
+        <table>
+            <tr>
+                <th>Einreichungsdatum</th>
+                <td>{{ phase.submission_date|date:"d.m.Y"|default:"–" }}</td>
+            </tr>
+            <tr>
+                <th>Angebotsdatum</th>
+                <td>{{ phase.offer_date|date:"d.m.Y"|default:"–" }}</td>
+            </tr>
+            <tr>
+                <th>Startdatum</th>
+                <td>{{ phase.start_date|date:"d.m.Y"|default:"–" }}</td>
+            </tr>
+            <tr>
+                <th>Enddatum</th>
+                <td>{{ phase.end_date|date:"d.m.Y"|default:"–" }}</td>
+            </tr>
+            <tr>
+                <th>Feedbackdatum</th>
+                <td>{{ phase.feedback_date|date:"d.m.Y"|default:"–" }}</td>
+            </tr>
+        </table>
+        Status: <span class="badge">{{ phase.status_display }}</span>
+    </div>
+
+    <div class="card">
+        <h3>Infos</h3>
+        <table>
+            <tr>
+                <th>Studentenwünsche</th>
+                <td>{% if phase.student_wishes %}Ja{% else %}Nein{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Handling-Typ</th>
+                <td>{{ phase.get_handling_type_display }}</td>
+            </tr>
+        </table>
+        <h3>Aktionen</h3>
+        {% if perms.researches.change_researchphase %}
+        <a href="{% url 'researches:researchphase_update' phase.pk %}" class="btn" style="display:block; margin-bottom:0.5rem;">Bearbeiten</a>
+        {% endif %}
+        {% if perms.researches.delete_researchphase and researches|length == 0 %}
+        <a href="{% url 'researches:researchphase_delete' phase.pk %}" class="btn" style="display:block; background:#e74c3c;">Löschen</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="info-grid">
+    <div class="card">
+        <h3>Zugehörige Kurse</h3>
+        <div>
+            {% for entry in courses %}
+            {% if not entry.current_type is None %}
+                <div class="card">
+                    <a href="{% url 'organization:course_detail' entry.course.id %}">{{ entry.course.course_nr }}</a>
+                    : {{entry.current_type}} ({{ entry.course.total_students }} Studierende)
+                </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="card">
+        <h3>Statistik</h3>
+        <table>
+            <tr>
+                <th>Summe Forschungsarbeiten</th>
+                <td>{{total_students}}</td>
+            </tr>
+            <tr>
+                <th>Einreichung gestartet</th>
+                <td>{{ researches|length }}</td>
+            </tr>
+            <tr>
+                <th>Eingereicht</th>
+                <td>{{ total_students_topic_submitted }}</td>
+            </tr>
+            <tr>
+                <th>Wiss. Betreuung fix</th>
+                <td>{{ total_students_assessor_scien }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="card" style="margin-top:1.5rem;">
+    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.5rem;">
+        <h3 style="margin:0;">Zugehörige Forschungsarbeiten ({{ researches|length }})</h3>
+        <a href="{% url 'researches:researchphase_csv_export' phase.pk %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">CSV herunterladen</a>
+    </div>
+    {% if researches %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Titel</th>
+                <th>Veranstaltung</th>
+                <th>Wiss. Betreuer</th>
+                <th>Themeneinreichung</th>
+                <th>Start</th>
+                <th>Ende</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for research in researches %}
+            <tr>
+                <td>{{ research.student.person.get_full_name }}</td>
+                <td>
+                    <a href="{% url 'researches:research_detail' research.pk %}">
+                        {{ research.title|default:"(Kein Titel)" }}
+                    </a>
+                </td>
+                <td>{{ research.unit.unit_name_short|default:research.unit.unit_name }}</td>
+                <td>{{ research.assessor_scien.person.get_short_name|default:"–" }}</td>
+                <td>{{ research.topic_submit_deadline|date:"d.m.Y" }}</td>
+                <td>{{ research.start_date|date:"d.m.Y" }}</td>
+                <td>{{ research.end_date|date:"d.m.Y" }}</td>
+                <td><span class="badge">{{ research.status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Forschungsarbeiten in dieser Phase.</p>
+    {% endif %}
+</div>
+{% endblock %}

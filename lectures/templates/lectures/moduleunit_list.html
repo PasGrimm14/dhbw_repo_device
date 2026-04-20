@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Lehrveranstaltungen - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>📝 Lehrveranstaltungen</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Veranstaltung oder Modul..." value="{{ request.GET.search }}">
+            <select name="semester">
+                <option value="">Alle Semester</option>
+                <option value="1" {% if request.GET.semester == '1' %}selected{% endif %}>1. Semester</option>
+                <option value="2" {% if request.GET.semester == '2' %}selected{% endif %}>2. Semester</option>
+                <option value="3" {% if request.GET.semester == '3' %}selected{% endif %}>3. Semester</option>
+                <option value="4" {% if request.GET.semester == '4' %}selected{% endif %}>4. Semester</option>
+                <option value="5" {% if request.GET.semester == '5' %}selected{% endif %}>5. Semester</option>
+                <option value="6" {% if request.GET.semester == '6' %}selected{% endif %}>6. Semester</option>
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'lectures:unit_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if units %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nr.</th>
+                <th>Name</th>
+                <th>Kurzname</th>
+                <th>Modul</th>
+                <th>Einheiten</th>
+                <th>Semester</th>
+                <th>Noten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for unit in units %}
+            <tr>
+                <td>{{ unit.unit_nr }}</td>
+                <td>{{ unit.unit_name }}</td>
+                <td><strong>{{ unit.unit_name_short|default:"-" }}</strong></td>
+                <td>
+                    <a href="{% url 'lectures:module_detail' unit.module.id %}">
+                        {{ unit.module.module_nr }}
+                    </a>
+                </td>
+                <td>{{ unit.units }}</td>
+                <td>{{ unit.semester_nr }}. Semester</td>
+                <td><span class="badge">{{ unit.num_grades }}</span></td>
+                <td>
+                    <a href="{% url 'lectures:unit_detail' unit.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Lehrveranstaltungen gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'lectures:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

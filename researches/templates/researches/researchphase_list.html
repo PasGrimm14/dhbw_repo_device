@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Forschungsphasen{% endblock %}
+
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+    <h2>Forschungsphasen</h2>
+    {% if perms.researches.add_researchphase %}
+    <a href="{% url 'researches:researchphase_create' %}" class="btn">+ Neue Phase</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    {% if phases %}
+    <table>
+        <thead>
+            <tr>
+                <th>Bezeichnung</th>
+                <th>Einreichung</th>
+                <th>Angebotsdatum</th>
+                <th>Start</th>
+                <th>Ende</th>
+                <th>Feedback</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for phase in phases %}
+            <tr>
+                <td><a href="{% url 'researches:researchphase_detail' phase.pk %}">{{ phase.name }}</a></td>
+                <td>{{ phase.submission_date|date:"d.m.Y"|default:"–" }}</td>
+                <td>{{ phase.offer_date|date:"d.m.Y"|default:"–" }}</td>
+                <td>{{ phase.start_date|date:"d.m.Y"|default:"–" }}</td>
+                <td>{{ phase.end_date|date:"d.m.Y"|default:"–" }}</td>
+                <td>{{ phase.feedback_date|date:"d.m.Y"|default:"–" }}</td>
+                <td><span class="badge">{{ phase.status_display }}</span></td>
+                <td>
+                    {% if perms.researches.change_researchphase %}
+                    <a href="{% url 'researches:researchphase_update' phase.pk %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Bearbeiten</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Noch keine Forschungsphasen angelegt.</p>
+    {% endif %}
+</div>
+{% endblock %}

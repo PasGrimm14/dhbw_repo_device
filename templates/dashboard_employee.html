@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<div class="card">
+    <p>Hallo {{ user.get_full_name|default:user.username }}</p>
+    <br>
+    <h3>Quick-Links</h3>
+    <a class="btn" href="{% url 'lectures:day_view' %}">Semesteransicht Vorlesungen</a>
+</div>
+
+<div class="info-grid">
+    <div class="card">
+        <h3>Kurse</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_courses }}</p>
+        <a href="{% url 'organization:course_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Studenten</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_students }}</p>
+        <a href="{% url 'persons:student_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Personal</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_personnel }}</p>
+        <a href="{% url 'persons:personnel_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Zuletzt hinzugefügt</h3>
+    {% if recent_persons %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>E-Mail</th>
+                <th>Rolle</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for person in recent_persons %}
+            <tr>
+                <td>{{ person.get_full_name }}</td>
+                <td>{{ person.mail_main|default:"-" }}</td>
+                <td><span class="badge">{{ person.get_role_now_display }}</span></td>
+                <td>
+                    <a href="{% url 'persons:person_detail' person.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Noch keine Personen vorhanden.</p>
+    {% endif %}
+</div>
+
+<h2>Unternehmen Dashboard</h2>
+
+<div class="info-grid">
+    <div class="card">
+        <h3>Alle Unternehmen</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_companies }}</p>
+        <a href="{% url 'persons:company_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Mit Studenten</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ companies_with_students }}</p>
+        <a href="{% url 'persons:company_list' %}?has_students=yes" class="btn">Anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Ohne Studenten</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ companies_without_students }}</p>
+        <a href="{% url 'persons:company_list' %}?has_students=no" class="btn">Anzeigen</a>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Top 10 Unternehmen nach Studentenanzahl</h3>
+    {% if top_companies %}
+    <table>
+        <thead>
+            <tr>
+                <th>Unternehmen</th>
+                <th>Stadt</th>
+                <th>Studenten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in top_companies %}
+            <tr>
+                <td>{{ company.name }}</td>
+                <td>{{ company.get_short_address }}</td>
+                <td><span class="badge">{{ company.num_students }}</span></td>
+                <td>
+                    <a href="{% url 'persons:company_detail' company.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Noch keine Unternehmen mit Studenten vorhanden.</p>
+    {% endif %}
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+    <div class="card">
+        <h3>Zuletzt hinzugefügt</h3>
+        {% if recent_companies %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Stadt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in recent_companies %}
+                <tr>
+                    <td>
+                        <a href="{% url 'persons:company_detail' company.id %}">{{ company.name }}</a>
+                    </td>
+                    <td>{{ company.city|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Noch keine Unternehmen vorhanden.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h3>Unternehmen nach Bundesland</h3>
+        {% if companies_by_state %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Bundesland</th>
+                    <th>Anzahl</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in companies_by_state %}
+                <tr>
+                    <td>{{ item.state|default:"Unbekannt" }}</td>
+                    <td><span class="badge">{{ item.count }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Keine Daten vorhanden.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

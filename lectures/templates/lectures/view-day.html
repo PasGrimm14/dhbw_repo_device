@@ -1,0 +1,96 @@
+{% load static %}
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=, initial-scale=1.0" />
+    <title>Tagesübersicht</title>
+    <link
+      rel="stylesheet"
+      href="{% static 'lectures/css/lectures.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'lectures/css/view-day.css' %}"
+    />
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
+    <meta name="description" content="Tagesübersicht" />
+    <!-- Timetable styles moved to CSS (vorlesungsuebersicht.css) -->
+  </head>
+  <body>
+    <!--No header nor footer because this is a specialized view designated for the secretary office only and shall be optimized for large screens-->
+    <main>
+      <!--This is the daily overview over all courses schedule for the secretary office. It shall specially optimized for large screens-->
+
+      <section class="calendar-metadata">
+        <div class="calendar-controls">
+          <button class="calendar-control" aria-label="Jump to previous day">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              ></path>
+            </svg>
+          </button>
+          <button class="calendar-control" aria-label="Jump to next day">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <h1>Tagesplan - <span id="current-date"></span></h1>
+        <button class="today-button" id="todayButton" aria-label="Zu heute springen">Heute</button>
+        <a class="today-button" href="{% url 'lectures:day_view' %}?load=1{% if token %}&token={{ token }}{% endif %}">Daten Aktualisieren</a>
+        <a class="today-button" href="{% url 'persons:dashboard' %}">Dashboard</a>
+      </section>
+      <section class="calendar" id="timetable">
+        <!-- Current Time Overlay (vertical marker) -->
+        <div class="current-time-overlay" id="currentTimeOverlay">
+          <div class="time-indicator" id="currentTimeIndicator"></div>
+          <div class="time-label" id="currentTimeLabel"></div>
+        </div>
+
+        <!-- Top row: course header (time headers will be generated dynamically) -->
+        <div class="header course-header"></div>
+
+        <!-- Course columns (first row) - dynamically generated -->
+        {% for course_id in course_list %}
+        <div class="course-name" style="grid-column: {{ forloop.counter|add:1 }}">
+          {{ course_id }}
+        </div>
+        {% endfor %}
+      </section>
+    </main>
+    <script type="module">
+      // Pass course IDs and plan data from Django template to JavaScript
+      window.COHORT_IDS = {{ courses|safe }};
+      window.COHORTS_DATA = {{ courses_data|safe }};
+      window.DAY_VIEW_INITIAL_DATE = "{{ initial_date|default:'' }}";
+    </script>
+    <script
+      type="module"
+      src="{% static 'lectures/js/view-day.js' %}"
+    ></script>
+  </body>
+</html>

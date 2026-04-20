@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ research.unit.unit_name }} Themeneinreichung{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Anmeldung und Themeneinreichung für die {{ research.unit.unit_name }}</h2>
+</div>
+<p class="page-subtitle">Moduleinheit: {{ research.unit.unit_name }} &mdash; {{student.course.field}} &mdash; DHBW {{student.course.academy}}</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="info-grid">
+        {# ---- Persönliche Daten ---- #}
+        <div class="card">
+            <h3>Ihre Daten</h3>
+            <table>
+                <tr>
+                    <th>Vorname</th>
+                    <td>{{ student.person.firstname }}</td>
+                </tr>
+                <tr>
+                    <th>Nachname</th>
+                    <td>{{ student.person.lastname }}</td>
+                </tr>
+                <tr>
+                    <th>Kurs</th>
+                    <td>{{ student.course }}</td>
+                </tr>
+                <tr>
+                    <th>Matrikelnummer</th>
+                    <td>{{ student.matri_nr }}</td>
+                </tr>
+                <tr>
+                    <th>E-Mail (DHBW-E-Mail)</th>
+                    <td>{{ student.person.mail_main|default:'-' }}</td>
+                </tr>
+            </table>
+        </div>
+
+        {# ---- Betriebliche Ausbildungsleitung (read-only) ---- #}
+        <div class="card">
+            <h3>Angaben zur betrieblichen Ausbildungsleitung</h3>
+            <table>
+                <tr>
+                    <th>Dualer Partner</th>
+                    <td>{{ student.company.name|default:'-' }}</td>
+                </tr>
+                <tr>
+                    <th>Vorname</th>
+                    <td>{{ student.company_person.firstname|default:'-' }}</td>
+                </tr>
+                <tr>
+                    <th>Nachname</th>
+                    <td>{{ student.company_person.lastname|default:'-' }}</td>
+                </tr>
+                <tr>
+                    <th>E-Mail (berufliche E-Mail)</th>
+                    <td>{{ student.company_person.mail_main|default:'-' }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    {# ---- Betriebliche Betreuung der Arbeit ---- #}
+    <div class="card">
+        <h3>Angaben zur betrieblichen Betreuung der {{ research.unit.unit_name }}</h3>
+        <div class="row">
+            <label>Unternehmen der Betreuung
+                <input type="text" name="bet_dual_partner" placeholder="Dualer Partner"
+                    value="{{ company_context|default:'' }}">
+            </label>
+        </div>
+        <div class="cols-2">
+            <label>Ansprache
+                <br>
+                <label class="label-rb">
+                    <input type="radio" name="bet_salutation_short" value="M"
+                        {% if research.assessor_oper.gender == 'M' %}checked{% endif %}>
+                    Herr
+                </label>
+                <label class="label-rb">
+                    <input type="radio" name="bet_salutation_short" value="F"
+                        {% if research.assessor_oper.gender == 'F' %}checked{% endif %}>
+                    Frau
+                </label>
+                <label class="label-rb">
+                    <input type="radio" name="bet_salutation_short" value="D"
+                        {% if research.assessor_oper.gender == 'D' %}checked{% endif %}>
+                    Divers
+                </label>
+            </label>
+            <label>Titel (Dr., ...)
+                <input type="text" name="bet_title" placeholder="Titel" maxlength="29"
+                    value="{{ research.assessor_oper.title|default:'' }}">
+            </label>
+        </div>
+        <div class="cols-2">
+            <label>Vorname
+                <input type="text" name="bet_firstname" placeholder="Vorname" maxlength="49"
+                    value="{{ research.assessor_oper.firstname|default:'' }}">
+            </label>
+            <label>Nachname
+                <input type="text" name="bet_lastname" placeholder="Nachname" maxlength="49"
+                    value="{{ research.assessor_oper.lastname|default:'' }}">
+            </label>
+        </div>
+        <div class="cols-2">
+            <label>E-Mail
+                <input type="email" name="bet_email" placeholder="E-Mail (berufliche E-Mail)" maxlength="199"
+                    value="{{ research.assessor_oper.mail_main|default:'' }}">
+            </label>
+            <label>Telefonnummer (optional)
+                <input type="text" name="bet_tel" placeholder="Telefonnummer (optional)" maxlength="29"
+                    value="{{ research.assessor_oper.tel_main|default:'' }}">
+            </label>
+        </div>
+        <label class="toggle">
+            <input type="checkbox" name="bet_approved"
+                {% if research.approved_oper %}checked{% endif %}>
+            Thema der Arbeit ist von der betrieblichen Betreuung genehmigt
+        </label>
+        <p class="hint">
+            Eine Unterschrift der betrieblichen Betreuung ist nicht notwendig.
+            Die betriebliche Betreuung kann einen Widerspruch im Falle einer fehlenden Absprache erheben.
+        </p>
+    </div>
+
+    {# ---- Angaben zur wissenschaftlichen Arbeit ---- #}
+    <div class="card">
+        <h3>Angaben zur wissenschaftlichen Arbeit</h3>
+        <div class="row">
+            <label>Titel der Arbeit {% if research.unit.unit_name_short == 'BA' %} <span class="fw-normal">(wird in Ihrem Bachelorzeugnis so abgebildet)</span>{% endif %}
+                <input type="text" name="res_title" placeholder="Titel der Arbeit" maxlength="500"
+                    value="{{ research.title|default:'' }}">
+            </label>
+        </div>
+        <div class="row">
+            <label>Problemstellung
+                <textarea name="res_problem" rows="8" placeholder="Problemstellung der Arbeit">{{ research.problem|default:'' }}</textarea>
+            </label>
+        </div>
+        <div class="row">
+            <label>Zielsetzung
+                <textarea name="res_goal" rows="8" placeholder="Zielsetzung der Arbeit">{{ research.goal|default:'' }}</textarea>
+            </label>
+        </div>
+        <div class="row">
+            <label>Methodik und Vorgehensweise
+                <textarea name="res_method" rows="8" placeholder="Methodik der Arbeit">{{ research.methodology|default:'' }}</textarea>
+            </label>
+        </div>
+    </div>
+
+    {# ---- Wunschbetreuung ---- #}
+    {% if research.research_phase.student_wishes %}
+    <div class="card">
+        <h3>Wissenschaftliche Wunschbetreuung</h3>
+        <p class="hint">
+            Diese Information wird bei der Vergabe der wissenschaftlichen Betreuung berücksichtigt.<br>
+            Es besteht <strong>kein Anspruch</strong> auf die angegebene Wunschbetreuung.
+        </p>
+        <div class="row">
+            <label>Wunschbetreuung (optional)
+                <input type="text" name="wunschbetreuung" placeholder="Name der Wunschbetreuung"
+                    value="{{ research.comment|default:'' }}">
+            </label>
+        </div>
+    </div>
+    {% endif %}
+
+    {# ---- Aktionen ---- #}
+    <div class="card actions">
+        <p class="note">Dies ist noch nicht die finale Einreichung. Diese kommt im nächsten Schritt.</p>
+        <div class="actions-row">
+            <button type="submit" name="action" value="save" class="btn">Zwischenspeichern</button>
+            <button type="submit" name="action" value="preview" class="btn">Speichern &amp; nächster Schritt &rarr;</button>
+        </div>
+    </div>
+
+</form>
+{% endblock %}

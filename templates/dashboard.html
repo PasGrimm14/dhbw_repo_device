@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<div class="card">
+    <p>Hallo {{ user.get_full_name|default:user.username }}</p>
+</div>
+
+{% endblock %}

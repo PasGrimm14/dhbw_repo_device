@@ -1,0 +1,367 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anmelden – N'SYNC</title>
+    <style>
+        :root {
+            --dhbw-red: #e2001a;
+            --dhbw-dark: #00284a;
+            --dhbw-grey: #4B5B63;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "GenerisSansW01-Regular", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #757575 0%, #7a7a7a 40%, #9b9b9b 100%);
+            background-attachment: fixed;
+        }
+
+        /* ── Main content ── */
+        .page-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .login-card {
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        /* ── Card header ── */
+        .login-header {
+            background: lightgrey;
+            padding: 1.75rem 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .login-header .dhbw-wordmark {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .login-header .dhbw-badge {
+            background: var(--dhbw-red);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+            padding: 0.2rem 0.55rem;
+            border-radius: 2px;
+        }
+
+        .login-header .dhbw-location {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        .login-header h1 {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+            font-weight: 400;
+            margin-top: 0.25rem;
+        }
+
+        /* ── Card body ── */
+        .login-body {
+            padding: 1.75rem 2rem;
+        }
+
+        /* ── Shibboleth button ── */
+        .btn-shibboleth {
+            display: block;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: #8c0012;
+            color: #fff;
+            text-align: center;
+            border-radius: 3px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            transition: background 0.2s;
+        }
+
+        .btn-shibboleth:hover {
+            background: #be0016;
+            color: #fff;
+        }
+
+        /* ── Collapsible local login ── */
+        .alt-login-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.6rem 0;
+            margin-top: 1.25rem;
+            color: var(--dhbw-grey);
+            font-size: 0.85rem;
+        }
+
+        .alt-login-toggle::before,
+        .alt-login-toggle::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .alt-login-toggle .toggle-arrow {
+            transition: transform 0.25s;
+            font-size: 0.7rem;
+            margin-left: 0.25rem;
+        }
+
+        .alt-login-toggle.open .toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .alt-login-section {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .alt-login-section.open {
+            display: block;
+        }
+
+        /* ── Form elements ── */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--dhbw-grey);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.55rem 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.95rem;
+            color: #333;
+            transition: border-color 0.15s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--dhbw-dark);
+            box-shadow: 0 0 0 2px rgba(0,40,74,0.12);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 2.5rem;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1rem;
+            user-select: none;
+            color: #999;
+        }
+
+        .toggle-password:hover {
+            color: #333;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--dhbw-dark);
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 0.25rem;
+        }
+
+        .btn-login:hover {
+            background: #003a6e;
+        }
+
+        /* ── Alerts ── */
+        .alert {
+            padding: 0.65rem 0.85rem;
+            border-radius: 3px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-error {
+            color: #842029;
+            background: #f8d7da;
+            border: 1px solid #f5c2c7;
+        }
+
+        .alert-warning {
+            color: #664d03;
+            background: #fff3cd;
+            border: 1px solid #ffecb5;
+        }
+
+        /* ── Cookie notice ── */
+        .cookie-notice {
+            font-size: 0.78rem;
+            color: #999;
+            text-align: center;
+            margin-top: 1.25rem;
+            line-height: 1.4;
+        }
+
+        /* ── Footer ── */
+        footer {
+            background: lightgrey;
+            padding: 0.85rem 1rem;
+            text-align: center;
+            color: rgb(92 105 113);
+        }
+
+        h1{
+            text-align: center;
+            color: rgb(92 105 113);
+            margin-bottom: 1em;
+            font-size: 1.5em;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .login-body {
+                padding: 1.25rem 1.25rem;
+            }
+            .login-header {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-content">
+    <div class="login-card">
+
+        <!-- Header -->
+        <div class="login-header">
+            <img src="{% static '/images/dhbw-heilbronn.png' %}" style="width:100%" alt="Logo DHBW">
+        </div>
+
+        <!-- Body -->
+        <div class="login-body">
+            <h1>N'SYNC <br> Studiumsverwaltung</h1>
+
+            <!-- Shibboleth SSO -->
+            <a href="/saml2/login/" class="btn-shibboleth">Login via Shibboleth (DHBW)</a>
+
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-warning" style="margin-top:1rem;">&#9888; {{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Collapsible local login -->
+            <button class="alt-login-toggle{% if form.errors %} open{% endif %}" onclick="toggleAltLogin(this)" type="button">
+                Alternative Anmeldedaten
+                <span class="toggle-arrow">&#9660;</span>
+            </button>
+
+            <div class="alt-login-section{% if form.errors %} open{% endif %}" id="alt-login-section">
+
+                {% if form.errors %}
+                <div class="alert alert-error">Benutzername oder Passwort ist nicht korrekt.</div>
+                {% endif %}
+
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    <div class="form-group">
+                        <label for="id_username">Benutzername</label>
+                        <input type="text" id="id_username" name="username" autofocus required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password">Kennwort</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="id_password" name="password" required>
+                            <span class="toggle-password" onclick="togglePassword()">&#128065;</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login">Anmelden</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>Ein Projekt des Studiengangs Wirtschaftsinformatik der DHBW Heilbronn</p>
+</footer>
+
+<script>
+    function toggleAltLogin(btn) {
+        const section = document.getElementById('alt-login-section');
+        const isOpen = section.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+    }
+
+    function togglePassword() {
+        const input = document.getElementById('id_password');
+        const icon = document.querySelector('.toggle-password');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.innerHTML = '&#128584;';
+        } else {
+            input.type = 'password';
+            icon.innerHTML = '&#128065;';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Studienjahre - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Studienjahre</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Jahrgang..." value="{{ request.GET.search }}">
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'organization:year_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if years %}
+    <table>
+        <thead>
+            <tr>
+                <th>Jahrgang</th>
+                <th>Aktuelles Semester</th>
+                <th>Anzahl Kurse</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year in years %}
+            <tr>
+                <td><strong>{{ year.year_name }}</strong></td>
+                <td>
+                    {% with current=year.get_current_semester %}
+                    {% if current %}
+                    <span class="badge" style="background: #27ae60;">{{ current.name_short }} (läuft)</span>
+                    {% else %}
+                    <span class="badge" style="background: #95a5a6;">Kein aktives Semester</span>
+                    {% endif %}
+                    {% endwith %}
+                </td>
+                <td><span class="badge">{{ year.courses.count }}</span></td>
+                <td>
+                    <a href="{% url 'organization:year_detail' year.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Keine Studienjahre gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

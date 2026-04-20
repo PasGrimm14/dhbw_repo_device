@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Studenten - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Studenten</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Matrikelnummer oder Name..." value="{{ search_query }}">
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'persons:student_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if students %}
+    <table>
+        <thead>
+            <tr>
+                <th>Matrikel-Nr.</th>
+                <th>Name</th>
+                <th>E-Mail</th>
+                <th>Kurs</th>
+                <th>Studienrichtung</th>
+                <th>Unternehmen</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.matri_nr }}</td>
+                <td>{{ student.person.get_full_name }}</td>
+                <td>{{ student.person.mail_main|default:"-" }}</td>
+                <td>{{ student.course }}</td>
+                <td>{{ student.field }}</td>
+                <td>{{ student.company }}</td>
+                <td>
+                    <a href="{% url 'persons:student_detail' student.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Studenten gefunden.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Datenimport{% endblock %}
+
+{% block content %}
+<h2>Datenimport</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div>
+        <label for="{{ form.import_type.id_for_label }}">{{ form.import_type.label }}</label>
+        {{ form.import_type }}
+    </div>
+
+    <div id="import-description" style="margin: 0.5rem 0; font-size: 0.9rem; color: #555;"></div>
+
+    <div>
+        <label for="{{ form.organisation.id_for_label }}">{{ form.organisation.label }}</label>
+        {{ form.organisation }}
+        <small>{{ form.organisation.help_text }}</small>
+    </div>
+
+    <div id="module-unit-fields" style="display: none;">
+        <div>
+            <label for="{{ form.study_regulation.id_for_label }}">{{ form.study_regulation.label }}</label>
+            {{ form.study_regulation }}
+            <small>{{ form.study_regulation.help_text }}</small>
+        </div>
+        <div>
+            <label for="{{ form.pa1_unit_nr.id_for_label }}">{{ form.pa1_unit_nr.label }}</label>
+            {{ form.pa1_unit_nr }}
+            <small>{{ form.pa1_unit_nr.help_text }}</small>
+        </div>
+        <div>
+            <label for="{{ form.pa2_unit_nr.id_for_label }}">{{ form.pa2_unit_nr.label }}</label>
+            {{ form.pa2_unit_nr }}
+            <small>{{ form.pa2_unit_nr.help_text }}</small>
+        </div>
+        <div>
+            <label for="{{ form.ba_unit_nr.id_for_label }}">{{ form.ba_unit_nr.label }}</label>
+            {{ form.ba_unit_nr }}
+            <small>{{ form.ba_unit_nr.help_text }}</small>
+        </div>
+    </div>
+
+    <div>
+        <label for="{{ form.csv_file.id_for_label }}">{{ form.csv_file.label }}</label>
+        {{ form.csv_file }}
+    </div>
+
+    <button type="submit">Import starten</button>
+</form>
+
+{% if results is not None %}
+<hr>
+<h3>Ergebnis</h3>
+{% if results %}
+<p>
+    {{ results|length }} Zeile(n) verarbeitet –
+    <strong>{{ created_count }}</strong> neu angelegt,
+    <strong>{{ updated_count }}</strong> aktualisiert,
+    <strong>{{ skipped_count }}</strong> übersprungen,
+    <strong>{{ duplicate_count }}</strong> Duplikate,
+    <strong>{{ error_count }}</strong> Fehler.
+</p>
+<ul>
+    {% for r in results %}
+    <li>
+        {% if r.status == 'created' %}
+            ✚ Neu angelegt: {{ r.name }}
+        {% elif r.status == 'updated' %}
+            ✔ Aktualisiert: {{ r.name }}
+        {% elif r.status == 'skipped' %}
+            → Übersprungen: {{ r.name }}
+        {% elif r.status == 'duplicate' %}
+            ⚠ Duplikat: {{ r.name }}
+        {% elif r.status == 'error' %}
+            ✖ Fehler: {{ r.name }}
+        {% else %}
+            ℹ {{ r.name }}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Keine Zeilen verarbeitet.</p>
+{% endif %}
+{% endif %}
+
+{{ import_type_descriptions|json_script:"import-type-descriptions-data" }}
+<script>
+    const descriptions = JSON.parse(document.getElementById("import-type-descriptions-data").textContent);
+    const select = document.getElementById("{{ form.import_type.id_for_label }}");
+    const descBox = document.getElementById("import-description");
+    const moduleUnitFields = document.getElementById("module-unit-fields");
+
+    function updateDescription() {
+        descBox.innerHTML = descriptions[select.value] || "";
+        moduleUnitFields.style.display = select.value === "module_units" ? "" : "none";
+    }
+
+    select.addEventListener("change", updateDescription);
+    updateDescription();
+</script>
+{% endblock %}

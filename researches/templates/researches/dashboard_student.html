@@ -1,0 +1,38 @@
+{% extends 'researches/dashboard.html' %}
+
+{% block group_dashboard %}
+<div class="">
+
+    {% for item in phases %}
+    <div class="card">
+        <h3>{{ item.label }}</h3>
+        {% if item.phase is None %}
+            <p>Einreichung noch nicht geöffnet</p>
+        {% else %}
+            {% with status=item.phase.status_display %}
+                <p>{{ status }}</p>
+
+                {% if item.research and item.research.title is not None %}
+                    <p>{{item.research.title|default:''}}</p>
+                {% endif %}
+
+                {% if status == "Themeneinreichung" %}
+                    {% if not item.research %}
+                        <a href="{% url 'researches:research_form_start' item.phase.id %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Thema starten</a>
+                    {% elif item.research and item.research.topic_submitted_date is None %}
+                        <a href="{% url 'researches:research_form' item.research.id %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Thema einreichen</a>   
+                    {% elif item.research %}
+                        <a href="{% url 'researches:research_form_preview' item.research.id %}" class="btn" style="font-size:0.85em; padding:0.3em 0.8em;">Eingereicht ✅</a>
+                    {% endif %}
+                {% elif status == "In progress" and item.research %}
+                    <a href="{% url 'researches:research_form_preview' item.research.id %}" class="btn">Titeländerung</a>
+                {% elif item.research %}
+                    <a href="{% url 'researches:research_form_preview' item.research.id %}" class="btn">Anzeigen</a>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+    </div>
+    {% endfor %}
+    
+</div>
+{% endblock %}

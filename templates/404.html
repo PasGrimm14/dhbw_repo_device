@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Seite nicht gefunden – SG-Verwaltung{% endblock %}
+
+{% block content %}
+<div style="text-align:center; padding:4rem 1rem;">
+    <div style="font-size:5rem; margin-bottom:1rem;">🔍</div>
+    <h1 style="font-size:2.5rem; color:#2c3e50; margin-bottom:0.5rem;">404</h1>
+    <h2 style="font-size:1.3rem; color:#555; font-weight:400; margin-bottom:1.5rem;">Seite nicht gefunden</h2>
+    <p style="color:#777; max-width:420px; margin:0 auto 2rem;">
+        Die angeforderte Seite <strong>{{ request_path }}</strong> konnte nicht gefunden werden.
+        Möglicherweise wurde sie verschoben oder existiert nicht mehr.
+    </p>
+    <div style="display:flex; gap:1rem; justify-content:center;">
+        <a href="javascript:history.back()" class="btn btn-secondary">← Zurück</a>
+        <a href="/" class="btn">Zum Dashboard</a>
+    </div>
+</div>
+{% endblock %}

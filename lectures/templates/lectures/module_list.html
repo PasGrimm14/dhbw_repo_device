@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Module - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>📖 Module</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Modulnummer oder Name..." value="{{ request.GET.search }}">
+            <select name="study">
+                <option value="">Alle Studiengänge</option>
+                {% for study in studies %}
+                <option value="{{ study.id }}" {% if request.GET.study == study.id|stringformat:"s" %}selected{% endif %}>
+                    {{ study.study_progr }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'lectures:module_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if modules %}
+    <table>
+        <thead>
+            <tr>
+                <th>Modulnummer</th>
+                <th>Name</th>
+                <th>Credits</th>
+                <th>Studiengang</th>
+                <th>Studienrichtung</th>
+                <th>Veranstaltungen</th>
+                <th>Noten</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for module in modules %}
+            <tr>
+                <td><strong>{{ module.module_nr }}</strong></td>
+                <td>{{ module.name }}</td>
+                <td><span class="badge">{{ module.credits }} ECTS</span></td>
+                <td>{{ module.study.study_progr }}</td>
+                <td>{{ module.field|default:"-" }}</td>
+                <td><span class="badge">{{ module.num_units }}</span></td>
+                <td><span class="badge">{{ module.num_grades }}</span></td>
+                <td>
+                    <a href="{% url 'lectures:module_detail' module.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Module gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'lectures:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

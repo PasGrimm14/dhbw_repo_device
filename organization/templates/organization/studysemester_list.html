@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Semester - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Semester</h2>
+
+<div class="card">
+    <div class="search-box">
+        <form method="get">
+            <input type="text" name="search" placeholder="Suche nach Semester..." value="{{ request.GET.search }}">
+            <select name="type">
+                <option value="">Alle Typen</option>
+                <option value="Theorie" {% if request.GET.type == 'Theorie' %}selected{% endif %}>Theorie</option>
+                <option value="Praxis" {% if request.GET.type == 'Praxis' %}selected{% endif %}>Praxis</option>
+            </select>
+            <select name="cycle">
+                <option value="">Alle Zyklen</option>
+                <option value="A" {% if request.GET.cycle == 'A' %}selected{% endif %}>A-Zyklus</option>
+                <option value="B" {% if request.GET.cycle == 'B' %}selected{% endif %}>B-Zyklus</option>
+                <option value="X" {% if request.GET.cycle == 'X' %}selected{% endif %}>Unabhängig</option>
+            </select>
+            <select name="active">
+                <option value="">Alle</option>
+                <option value="yes" {% if request.GET.active == 'yes' %}selected{% endif %}>Nur Aktive</option>
+            </select>
+            <button type="submit" class="btn">Suchen</button>
+            <a href="{% url 'organization:semester_list' %}" class="btn btn-secondary">Zurücksetzen</a>
+        </form>
+    </div>
+    
+    {% if semesters %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Kurzname</th>
+                <th>Typ</th>
+                <th>Zyklus</th>
+                <th>Start</th>
+                <th>Ende</th>
+                <th>Dauer (Tage)</th>
+                <th>Status</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for semester in semesters %}
+            <tr>
+                <td>{{ semester.name }}</td>
+                <td><strong>{{ semester.name_short }}</strong></td>
+                <td><span class="badge">{{ semester.get_type_display }}</span></td>
+                <td>{{ semester.get_cycle_display }}</td>
+                <td>{{ semester.start_date|date:"d.m.Y" }}</td>
+                <td>{{ semester.end_date|date:"d.m.Y" }}</td>
+                <td>{{ semester.duration_days }}</td>
+                <td>
+                    {% if semester.is_active %}
+                    <span class="badge" style="background: #27ae60;">✓ Aktiv</span>
+                    {% else %}
+                    <span class="badge" style="background: #95a5a6;">Inaktiv</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'organization:semester_detail' semester.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-secondary">Erste</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">Zurück</a>
+        {% endif %}
+        
+        <span class="btn btn-secondary">Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Weiter</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Letzte</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <p>Keine Semester gefunden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'organization:dashboard' %}" class="btn btn-secondary">← Zurück zum Dashboard</a>
+</div>
+{% endblock %}

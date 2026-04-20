@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Studienorganisation Dashboard - SG-Verwaltung{% endblock %}
+
+{% block content %}
+<h2>Studienorganisation Dashboard</h2>
+
+<div class="info-grid">
+    <div class="card">
+        <h3>Studiengänge</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_programs }}</p>
+        <a href="{% url 'organization:program_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Studienrichtungen</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_fields }}</p>
+        <a href="{% url 'organization:field_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Akademien</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_academies }}</p>
+        <a href="{% url 'organization:academy_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+</div>
+
+<div class="info-grid" style="margin-top: 1.5rem;">
+    <div class="card">
+        <h3>Kurse</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_courses }}</p>
+        <a href="{% url 'organization:course_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Semester</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ total_semesters }}</p>
+        <a href="{% url 'organization:semester_list' %}" class="btn">Alle anzeigen</a>
+    </div>
+    
+    <div class="card">
+        <h3>Aktive Semester</h3>
+        <p style="font-size: 2rem; margin: 1rem 0;">{{ active_semesters }}</p>
+        <a href="{% url 'organization:semester_list' %}?active=yes" class="btn">Anzeigen</a>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 1.5rem;">
+    <h3>Zuletzt erstellte Kurse</h3>
+    {% if recent_courses %}
+    <table>
+        <thead>
+            <tr>
+                <th>Kurs-Nr.</th>
+                <th>Akademie</th>
+                <th>Studienrichtung</th>
+                <th>Jahrgang</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in recent_courses %}
+            <tr>
+                <td><strong>{{ course.course_nr }}</strong></td>
+                <td>{{ course.academy.academy_name }}</td>
+                <td>{{ course.field|default:"-" }}</td>
+                <td>{{ course.academic_year.year_name }}</td>
+                <td>
+                    <a href="{% url 'organization:course_detail' course.id %}" class="btn btn-secondary">Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Noch keine Kurse vorhanden.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 2rem;">
+    <h3>Schnellzugriff</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <a href="{% url 'organization:program_list' %}" class="btn">📖 Studiengänge</a>
+        <a href="{% url 'organization:field_list' %}" class="btn">🎯 Studienrichtungen</a>
+        <a href="{% url 'organization:academy_list' %}" class="btn">🏫 Akademien</a>
+        <a href="{% url 'organization:course_list' %}" class="btn">👥 Kurse</a>
+        <a href="{% url 'organization:semester_list' %}" class="btn">📅 Semester</a>
+        <a href="{% url 'organization:year_list' %}" class="btn">📆 Studienjahre</a>
+    </div>
+</div>
+{% endblock %}
